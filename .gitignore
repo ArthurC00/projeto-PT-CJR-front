@@ -10,7 +10,8 @@
 !.yarn/releases
 !.yarn/versions
 node_modules/
-
+cadastro/node_modules/
+.next/
 # testing
 /coverage
 
