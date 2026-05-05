@@ -5,7 +5,7 @@ export default function TodoList() {
   const campos = ["Nome Completo", "Username", "Email", "Senha", "Confirmar Senha"];
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-amber-100 p-4">
+    <div className="flex items-center justify-start min-h-screen bg-amber-100 p-20"> {/* div pai */}
       <div className="w-full max-w-md min-h-[600px] bg-black/90 rounded-[40px] p-10 flex flex-col items-center">
         
         <h1 className="text-white text-2xl font-bold mb-10 tracking-widest">CRIE SUA CONTA</h1>
