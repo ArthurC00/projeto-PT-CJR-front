@@ -6,9 +6,8 @@ export default function TodoList() {
   const campos = ["Nome Completo", "Username", "Email", "Senha", "Confirmar Senha"];
 
   return (
-    <div className="flex flex-col md:flex-row items-center justify-between min-h-screen bg-amber-100 p-10 md:p-20 w-full">
+    <div className="flex flex-col md:flex-row items-center justify-between min-h-screen bg-amber-50 p-10 md:p-20 w-full"> {/* div pai*/}
       
-      {/* --- COLUNA 1: FORMULÁRIO (ESQUERDA) --- */}
       <div className="w-full md:w-1/2 flex flex-col items-start justify-center">
         <div className="w-full max-w-md min-h-[600px] bg-black/95 rounded-[40px] p-10 flex flex-col items-center shadow-2xl">      
           <h1 className="text-white text-2xl font-bold mb-10 tracking-widest text-center">CRIE SUA CONTA</h1>
@@ -35,11 +34,22 @@ export default function TodoList() {
         </div>
       </div>
 
-      {/* --- COLUNA 2: ILUSTRAÇÃO (DIREITA) --- */}
+      {/* imagens colocadas mais pra direita */}
       <div className="w-full md:w-1/2 flex flex-col items-center justify-center relative h-[300px] md:h-[600px]">
-        {/* A logo STOCK.IO foi removida daqui */}
         
-        <div className="relative w-full h-full bottom-30 md:bottom-5">
+        <div className="relative w-full h-full bottom-0 md:bottom-0">
+          
+          {/* imagem LOGO */}
+          <div className="absolute -top-15 left-1/2 -translate-x-1/2 z-10 w-60 h-32">
+            <Image 
+              src="/logo.png" 
+              alt="Logo"
+              fill
+              style={{ objectFit: 'contain' }}
+            />
+          </div>
+
+          {/* style: alterei a escala e tamanho da imagem principal */}
           <Image 
             src="/foto.png" 
             alt="Ilustração"
