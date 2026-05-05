@@ -25,12 +25,12 @@ export default function TodoList() {
           ))}
         </div>
 
-        <button className="w-full mt-10 bg-indigo-600 text-white py-3 rounded-full font-bold hover:bg-indigo-700 transition-all">
+        <button className="w-full mt-10 bg-indigo-600 text-white py-3 rounded-full font-bold hover:bg-indigo-700 transition-all"> {/* arrumando a funçao ENTRAR para se tornar clicável, com a cor ficando mais escura ao clicar em cima. definição de layout */}
           ENTRAR
         </button>
 
-        <p className="text-gray-400 mt-4 text-sm">
-          Já possui uma conta? <span className="text-indigo-400 cursor-pointer hover:underline">Login</span>
+        <p className="text-gray-400 mt-4 text-sm self-start"> {/*  layout para CRIAR CONTA. */}
+          Já possui uma conta? <span className="text-indigo-400 cursor-pointer hover:underline">Login</span> {/* self-start: da ao código selecionado o proprio alinhamento */}
         </p>
       </div>
     </div>
