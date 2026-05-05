@@ -8,7 +8,7 @@ export default function TodoList() {
     <div className="flex items-center justify-start min-h-screen bg-amber-100 p-20"> {/* div pai */}
       <div className="w-full max-w-md min-h-[600px] bg-black/90 rounded-[40px] p-10 flex flex-col items-center">
         
-        <h1 className="text-white text-2xl font-bold mb-10 tracking-widest">CRIE SUA CONTA</h1>
+        <h1 className="text-amber-100 text-2xl font-bold mb-10 tracking-widest">CRIE SUA CONTA</h1> {/* style: cor do CRIE SUA CONTA ALTERADA. */}
 
         <div className="w-full flex flex-col gap-4">
           {campos.map((label, index) => (
