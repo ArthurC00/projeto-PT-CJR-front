@@ -7,33 +7,36 @@ export default function Login() { return (
             <Image
             src="/images/logo_stock.io.png"
             width={421}
-            height={267}
+            height={222}
             alt="Logo Stock.io"
             />
             <Image
             src="/images/stockles_caixa.png"
-            width={512.55}
-            height={1118.5}
+            width={514}
+            height={802}
             alt="Mascote Stockles segurando uma caixa."/>
         </div>
-        <div className="bg-[#171918] p-8 gap-4 w-[654px] h-[1068px]">
-            <h1>Bem vindo de volta!</h1>
+        <div className="bg-[#171918] p-12 self-end rounded-4xl text-center font-sans ">
+            <h1 className="font-black text-4xl m-6 tracking-wide">BEM VINDO DE VOLTA!</h1>
             <form className="flex flex-col">
-                <input type="email"
+                <input required
+                type="email"
                 name="email"
                 placeholder="Email"
                 aria-label="E-mail"
-                className="bg-[#FFFFFF] w-[504px] h-[42px]"
+                // inputs: w-[504px] h-[42px]
+                className="bg-[#FFFFFF] text-black rounded-full m-2 h-10 pl-8"
                 />
-                <input type="password"
+                <input required
+                type="password"
                 name="senha"
                 placeholder="Senha"
                 aria-label="Senha"
-                className="bg-[#FFFFFF] w-[504px] h-[42px]"
+                className="bg-[#FFFFFF] text-black rounded-full m-2 h-10 pl-8"
                 />
-                <p><Link href="/recuperar-conta">Esqueceu sua senha?</Link></p>
-                <button type="submit">Entrar</button>
-                <p>Não possui uma conta? <Link href="/cadastro">Cadastre-se</Link></p>
+                <p className="m-4 font-thin text-sm"><Link href="/recuperar-conta" className="underline">Esqueceu sua senha?</Link></p>
+                <button type="submit" className="bg-[#6A38F3] font-bold rounded-full m-2 h-11">ENTRAR</button>
+                <p className="text-start m-4 text-lg font-extralight">Não possui uma conta? <Link href="/cadastro" className="text-[#6A38F3] font-medium">Cadastre-se</Link></p>
             </form>
         </div>
     </main>
