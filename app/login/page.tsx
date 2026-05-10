@@ -1,7 +1,21 @@
+// coisas da integração
+'use client';
+import { useState } from 'react';
+
+// coisas da própria tela de login
 import Link from 'next/link'
 import Image from 'next/image'
 
-export default function Login() { return (
+export default function Login() { 
+    const [email, setEmail] = useState(''); // integração
+    const [password, setPassword] = useState('');
+
+    const handleLogin = async (e: React.FormEvent) => { // também é da integração
+    e.preventDefault(); // impede que a página recarregue quando clicar em "entrar"
+    console.log(email, password);
+    };
+
+    return (
     <main className="bg-[#F6F3E4] flex flex-row items-center justify-center justify-items-center h-screen w-screen">
         <div className="h-screen w-[50vw] justify-items-center">
             <Image className="w-auto h-1/4 self-center"
@@ -18,17 +32,20 @@ export default function Login() { return (
         </div>
         <div className="h-[85vh] w-[50vw] bg-[#171918] mr-16 pt-12 rounded-t-4xl text-center justify-self-start justify-center place-items-center font-sans self-end">
             <h1 className="font-black text-4xl m-6 tracking-wide">BEM VINDO DE VOLTA!</h1>
-            <form className="flex flex-col w-5/6">
+            <form onSubmit={handleLogin} className="flex flex-col w-5/6">
                 <input required
                 type="email"
+                value={email} // integração com React
+                onChange={(e) => setEmail(e.target.value)} // integração com React
                 name="email"
                 placeholder="Email"
                 aria-label="E-mail"
-                // inputs: w-[504px] h-[42px]
                 className="bg-[#FFFFFF] text-black rounded-full my-3 h-10 w-full pl-8"
                 />
                 <input required
                 type="password"
+                value={password} // integração com React
+                onChange={(e) => setPassword(e.target.value)} // integração com React
                 name="senha"
                 placeholder="Senha"
                 aria-label="Senha"
