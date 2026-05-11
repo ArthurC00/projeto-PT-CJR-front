@@ -42,9 +42,9 @@ export default function RegisterPage() {
       });
 
     } catch (error: any) {
-    const mensagemErro = error.response?.data?.message || "Erro desconhecido";
-    console.error("Detalhes do erro:", mensagemErro);
-    alert("Erro ao cadastrar: " + mensagemErro);
+      const mensagem = error.response?.data?.message || error.message || "Erro desconhecido";
+      console.error("Detalhes do erro:", error);
+      alert("Erro ao cadastrar: " + (Array.isArray(mensagem) ? mensagem.join(", ") : mensagem));
     }
   };
 
