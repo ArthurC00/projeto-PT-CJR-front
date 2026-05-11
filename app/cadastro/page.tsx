@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import api from "../services/api";
+import Link from "next/link";
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -114,9 +115,12 @@ export default function RegisterPage() {
 
           <p className="w-full text-gray-400 mt-5 text-sm text-left">
             Já possui uma conta?{" "}
-            <span className="text-indigo-400 cursor-pointer hover:underline">
+            <Link
+              className="text-indigo-400 cursor-pointer hover:underline"
+              href={"/login"}
+            >
               Login
-            </span>
+            </Link>
           </p>
         </form>
       </div>
