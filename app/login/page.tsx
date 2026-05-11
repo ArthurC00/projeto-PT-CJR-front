@@ -1,6 +1,8 @@
 // coisas da integração
 'use client';
 import { useState } from 'react';
+import axios from 'axios';
+import { useRouter } from 'next/navigation';
 
 // coisas da própria tela de login
 import Link from 'next/link'
@@ -9,12 +11,33 @@ import Image from 'next/image'
 export default function Login() { 
     const [email, setEmail] = useState(''); // integração
     const [password, setPassword] = useState('');
+    const router = useRouter();
 
     const handleLogin = async (e: React.FormEvent) => { // também é da integração
     e.preventDefault(); // impede que a página recarregue quando clicar em "entrar"
-    console.log(email, password);
-    };
+    
+        // console.log(email, password);
 
+        try {
+        // tentar conectar ao back-end
+        const response = await axios.post('http://localhost:3000/login', {
+            // dados a serem recebidos
+            email: email,
+            senha_hash: password // senha_hash foi o que usaram no back-end
+        });
+
+        console.log("login bem-sucedido", response.data);
+        alert("Logado com sucesso");
+        router.push('/dashboard'); // redirecionar o usuário para a página principal ao logar
+
+    } catch (error: any) {
+        // se houver erro no back-end
+        console.error("erro no login:", error.response?.data);
+        alert("Erro ao logar: " + (error.response?.data?.message || "servidor offline"));
+    }
+};
+
+    // a partir desse ponto é a própria tela de login
     return (
     <main className="bg-[#F6F3E4] flex flex-row items-center justify-center justify-items-center h-screen w-screen">
         <div className="h-screen w-[50vw] justify-items-center">
