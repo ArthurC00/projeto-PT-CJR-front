@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 // coisas da própria tela de login
 import Link from "next/link";
 import Image from "next/image";
+import { postLogin } from "../services/api";
 
 export default function Login() {
   const [email, setEmail] = useState(""); // integração
@@ -20,19 +21,12 @@ export default function Login() {
     // console.log(email, password);
 
     try {
-      // tentar conectar ao back-end
-      const response = await axios.post("http://localhost:3001/login", {
-        // dados a serem recebidos
-        email: email,
-        senha_hash: password, // senha_hash foi o que usaram no back-end
-      });
-
-      //console.log("login bem-sucedido", response.data);
+      await postLogin({ email: email, senha_hash: password });
       alert("Logado com sucesso");
       //router.push("/dashboard"); // redirecionar o usuário para a página principal ao logar
     } catch (error: any) {
       // se houver erro no back-end
-      console.error("erro no login:", error.response?.data);
+      console.error(error.response?.data);
       alert(
         "Erro ao logar: " +
           (error.response?.data?.message || "servidor offline"),
