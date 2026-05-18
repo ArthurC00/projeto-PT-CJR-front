@@ -4,9 +4,12 @@ import Image from "next/image";
 import Navbar from "./components/Navbar";
 import nonProfile from "../../public/profile/nonProfile.png";
 import emailIcon from "../../public/profile/iconEmail.svg";
+import { jwtDecode } from "jwt-decode";
 import { ChevronLeft, Star, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { getOneUser } from "../services/usersApi";
+import { decodeUserToken } from "../utils/auth";
 
 interface Product {
   name: string;
@@ -14,17 +17,46 @@ interface Product {
   available: boolean;
 }
 
-interface ProfilePageOutProps {
-  isOwner: boolean;
+interface ProfilePageProps {
+  userId: number;
 }
 
-export default function ProfilePageOut({ isOwner }: ProfilePageOutProps) {
-  const router = useRouter();
+export default function ProfilePage({ userId }: ProfilePageProps) {
   const [editProfileButton, setEditProfileButton] = useState(false);
+  const [userData, setUserData] = useState<UserDataProps>();
+  const [myId, setMyId] = useState<number>(0);
+  const [error, setError] = useState(false);
+
+  const router = useRouter();
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      const data = decodeUserToken(token);
+      if (data) setMyId(data?.userId);
+    }
+  }, []);
+
+  useEffect(() => {
+    const loadData = async () => {
+      const token = localStorage.getItem("token");
+      try {
+        if (token) {
+          const data = await getOneUser(userId, token);
+          setUserData(data);
+        }
+      } catch (e) {
+        setError(true);
+        return;
+      }
+    };
+    if (userId) {
+      loadData();
+    }
+  }, [userId]);
 
   const productStars = (rating: number) => {
     const validRating = Math.min(Math.max(rating, 0), 5);
-
     return (
       <div className="flex items-center gap-1 text-[#FFEB3A]">
         {Array.from({ length: 5 }).map((_, index) => {
@@ -66,10 +98,22 @@ export default function ProfilePageOut({ isOwner }: ProfilePageOutProps) {
     { name: "Primer", price: "R$259,90", available: true },
   ];
 
+  const isOwner = myId === userId;
+
   useEffect(() => {
     setEditProfileButton(isOwner);
   }, [isOwner]);
 
+  if (error) {
+    return (
+      <div className="min-h-screen bg-[#F6F3E4] text-black overflow-y-auto pb-20 flex flex-col items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-xl font-bold mb-2">Essa conta foi deletada.</h2>
+          <p>Temos que resolver isso</p>
+        </div>
+      </div>
+    );
+  }
   return (
     <div className="min-h-screen bg-[#F6F3E4] text-black overflow-y-auto pb-20">
       <Navbar />
@@ -85,24 +129,26 @@ export default function ProfilePageOut({ isOwner }: ProfilePageOutProps) {
           </button>
           <div className="w-[230px] h-[230px] rounded-full overflow-hidden border-4 border-[#F6F3E4] bg-white shadow-lg">
             <Image
-              src={nonProfile}
+              src={userData?.foto_perfil_url || nonProfile}
               alt="Usuário"
               width={230}
               height={230}
               className="object-cover w-full h-full"
+              priority
+              unoptimized
             />
           </div>
 
           <div className="pt-36">
             <h1 className="text-[52px] font-medium leading-[48px] text-black">
-              Selena Gomes
+              {userData?.nome}
             </h1>
             <h2 className="text-[29px] font-light text-black/60 mt-1">
-              @ selenagomez
+              @{userData?.username}
             </h2>
-            <h3 className="flex items-center text-[29px] font-light text-black/60 gap-2">
-              <Image src={emailIcon} width={24} height={24} alt="Email" />
-              selenamariegomez@rare.com
+            <h3 className="flex items-center text-[29px] font-light text-black/60 gap-2 w-5 h-auto">
+              <Image src={emailIcon} alt="Email" />
+              {userData?.email}
             </h3>
           </div>
           {editProfileButton && (

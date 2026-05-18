@@ -31,7 +31,6 @@ export default function RegisterPage() {
       });
 
       console.log("Sucesso:", response.data);
-      alert("Usuário cadastrado com sucesso!");
 
       // Limpar o formulário após o sucesso (opcional)
       setFormData({
