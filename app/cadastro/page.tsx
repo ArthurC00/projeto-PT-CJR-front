@@ -1,9 +1,13 @@
 "use client";
 import React, { useState } from "react";
 import Image from "next/image";
-import api from "../services/api";
+import { postCadastro } from "../services/api";
+import Link from "next/link";
+
+
 
 export default function RegisterPage() {
+
   const [formData, setFormData] = useState({
     nomeCompleto: "",
     username: "",
@@ -21,12 +25,12 @@ export default function RegisterPage() {
     e.preventDefault();
 
     try {
-      const response = await api.post("/usuarios", {
-        nome: formData.nomeCompleto, // O Back quer 'nome'
+      const response = await postCadastro({
+        nome: formData.nomeCompleto,
         username: formData.username,
         email: formData.email,
-        senha_hash: formData.senha, // O Back quer 'senha_hash'
-        foto_perfil_url: "", // O Back quer que seja uma string
+        senha_hash: formData.senha,
+        foto_perfil_url: "",
       });
 
       console.log("Sucesso:", response.data);
@@ -41,7 +45,7 @@ export default function RegisterPage() {
         confirmarSenha: "",
       });
     } catch (error: any) {
-      const mensagemErro = error.response?.data?.message || "Erro desconhecido";
+      const mensagemErro = error || "Erro desconhecido";
       console.error("Detalhes do erro:", mensagemErro);
       alert("Erro ao cadastrar: " + mensagemErro);
     }
@@ -114,9 +118,12 @@ export default function RegisterPage() {
 
           <p className="w-full text-gray-400 mt-5 text-sm text-left">
             Já possui uma conta?{" "}
-            <span className="text-indigo-400 cursor-pointer hover:underline">
+            <Link
+              className="text-indigo-400 cursor-pointer hover:underline"
+              href={"/login"}
+            >
               Login
-            </span>
+            </Link>
           </p>
         </form>
       </div>

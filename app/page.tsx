@@ -1,4 +1,8 @@
+import Image from "next/image";
 import { redirect } from "next/navigation";
+import {api} from "../app/services/api"
+import { useState } from "react";
+
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
