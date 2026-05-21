@@ -1,21 +1,24 @@
+"use client";
+
 import Image from "next/image";
 import stockioLogo from "../../../public/logoStockio.svg";
 import Link from "next/link";
 import profileIcon from "../../../public/navbarProfile.svg";
 import logoutIcon from "../../../public/logoutIcon.svg";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { jwtDecode } from "jwt-decode";
 
 export default function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [myId, setMyId] = useState(0);
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
-      const { userId, ...rest } = jwtDecode<UserDataProps>(token);
+      const { userId } = jwtDecode<UserDataProps>(token);
       setMyId(userId);
     }
     setIsLoggedIn(!!token);
@@ -24,7 +27,7 @@ export default function Navbar() {
   const handleLogout = () => {
     localStorage.removeItem("token");
     setIsLoggedIn(false);
-    router.push("/login");
+    window.location.reload();
   };
 
   const handleProfile = () => {
@@ -52,8 +55,8 @@ export default function Navbar() {
         ) : (
           <>
             <Link
-              href="/login"
-              className="font-spartan font-px-6 py-3 rounded-full font-semibold hover:scale-105 transition"
+              href={`/login?returnTo=${encodeURIComponent(pathname)}`}
+              className="font-spartan px-6 py-3 rounded-full font-semibold hover:scale-105 transition"
             >
               LOGIN
             </Link>
@@ -68,6 +71,7 @@ export default function Navbar() {
       </main>
     );
   }
+
   return (
     <main className="flex w-full py-3 bg-black items-center justify-between px-16">
       <Image src={stockioLogo} width={220} alt="stock.io"></Image>

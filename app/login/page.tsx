@@ -1,7 +1,7 @@
 // coisas da integração
 "use client";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 // coisas da própria tela de login
 import Link from "next/link";
@@ -13,22 +13,29 @@ export default function Login() {
   const [email, setEmail] = useState(""); // integração
   const [password, setPassword] = useState("");
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const handleLogin = async (e: React.FormEvent) => {
-    // também é da integração
-    e.preventDefault(); // impede que a página recarregue quando clicar em "entrar"
+    e.preventDefault(); // impede que a página recarregue
 
     try {
       const token = await postLogin({ email: email, senha_hash: password });
+
       if (token) {
         localStorage.setItem("token", token);
         const userData = decodeUserToken(token);
+
         if (userData) {
-          router.push(`/profile/${userData.userId}`);
+          const returnTo = searchParams.get("returnTo");
+
+          if (returnTo) {
+            router.push(returnTo);
+          } else {
+            router.push("/");
+          }
         }
       }
     } catch (error: any) {
-      // se houver erro no back-end
       console.error(error.response?.data);
       alert(
         "Erro ao logar: " +

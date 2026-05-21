@@ -39,12 +39,9 @@ export default function ProfilePage({ userId }: ProfilePageProps) {
 
   useEffect(() => {
     const loadData = async () => {
-      const token = localStorage.getItem("token");
       try {
-        if (token) {
-          const data = await getOneUser(userId, token);
-          setUserData(data);
-        }
+        const data = await getOneUser(userId);
+        setUserData(data);
       } catch (e) {
         setError(true);
         return;

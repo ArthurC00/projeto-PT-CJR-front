@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, League_Spartan } from "next/font/google";
 import "./globals.css";
-import AuthGuard from "./components/authGuard";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,9 +31,7 @@ export default function RootLayout({
       lang="pt-br"
       className={`${geistSans.variable} ${geistMono.variable} ${spartan.className} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
-        <AuthGuard>{children}</AuthGuard>
-      </body>
+      <body className="min-h-full flex flex-col">{children}</body>
     </html>
   );
 }
