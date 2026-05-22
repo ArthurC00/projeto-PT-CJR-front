@@ -4,6 +4,8 @@ import React from 'react';
 import { useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import { CgProfile } from "react-icons/cg";
+import { IoMdExit } from "react-icons/io";
 
 import Image from "next/image";
 import Link from "next/link"
@@ -29,22 +31,10 @@ export default function Navbar( {isLogged} : NavbarProps) {
                            </h1>
                            <div className="justify-items-right bg-black grid grid-cols-2 gap-1 mr-7 mt-3">
                                <a href="/perfil" className="">
-                               <Image
-                               className="object-cover hover:opacity-35"
-                               src="/navBarLogged/perfil.png"
-                               alt="perfil"
-                               width={30}
-                               height={30}            
-                               />
+                               < CgProfile className=" mt-0.5 h-7 w-7 hover:text-blue-500 "/>
                                </a>
-                               <a href="/sair" className="object-cover hover:opacity-35">
-                               <Image
-                               className="object-cover"
-                               src="/navBarLogged/exit.png"
-                               alt="sair"
-                               width={30}
-                               height={30}            
-                               />
+                               <a href="/sair" className="object-cover">
+                               < IoMdExit className=" mr-0.5 h-8 w-8 hover:text-red-500 "/>
                                </a>
                            </div>
                        </nav> 

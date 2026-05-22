@@ -5,42 +5,13 @@ import { useRouter } from "next/navigation";
 
 import Image from "next/image";
 import Link from "next/link"
+import Navbar from "@/components/navbar";
 
 export default function FeedPageLogged() {
   return (
     <div className="min-h-screen min-w-screen bg-amber-100"> 
       <div className=" object-cover min-w-screen min-h-95 max-h-112 bg-black justify-self-start"> 
-        <nav className="flex justify-between min-h-15 min-w-screen bg-black justify-items-center "> 
-            <h1>
-             <Image
-              className="relative top-3 left-4"
-              src="/logobranca.png" 
-              alt="logo"
-              width={150}
-              height={100}
-            />   
-            </h1>
-            <div className="justify-items-right bg-black grid grid-cols-2 gap-1 mr-7 mt-3">
-                <a href="/perfil" className="">
-                <Image
-                className="object-cover hover:opacity-35"
-                src="/navBarLogged/perfil.png"
-                alt="perfil"
-                width={30}
-                height={30}            
-                />
-                </a>
-                <a href="/sair" className="object-cover hover:opacity-35">
-                <Image
-                className="object-cover"
-                src="/navBarLogged/exit.png"
-                alt="sair"
-                width={30}
-                height={30}            
-                />
-                </a>
-            </div>
-        </nav>
+        <Navbar isLogged = {true}/>
         <Image
         className=" ml-300 justify-baseline bottom-0.5"
         src="/girlBox.png"
