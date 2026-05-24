@@ -2,7 +2,7 @@ import ProfilePage from "../ProfilePage";
 
 interface ProfileParams {
   params: Promise<{
-    userId: number;
+    userId: string;
   }>;
 }
 

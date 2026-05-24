@@ -27,11 +27,10 @@ export default function Login() {
 
         if (userData) {
           const returnTo = searchParams.get("returnTo");
-
           if (returnTo) {
             router.push(returnTo);
           } else {
-            router.push("/");
+            router.push(`/profile/${userData?.userId}`);
           }
         }
       }

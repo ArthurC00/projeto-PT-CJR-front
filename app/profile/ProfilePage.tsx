@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import Navbar from "./components/Navbar";
+import Navbar from "../../components/navbar";
 import nonProfile from "../../public/profile/nonProfile.png";
 import emailIcon from "../../public/profile/iconEmail.svg";
 import { jwtDecode } from "jwt-decode";
@@ -26,7 +26,6 @@ export default function ProfilePage({ userId }: ProfilePageProps) {
   const [userData, setUserData] = useState<UserDataProps>();
   const [myId, setMyId] = useState<number>(0);
   const [error, setError] = useState(false);
-
   const router = useRouter();
 
   useEffect(() => {
