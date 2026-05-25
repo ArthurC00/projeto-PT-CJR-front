@@ -1,17 +1,19 @@
 'use client';
 
-import { use, useState } from "react";
+import { useState } from "react";
 import Modal from "@/components/modal";
 
-export default function testeModais() {
+export default function TesteModais() {
     const [modalAberto, setModalAberto] = useState(false);
     
     return (
-        <div>
-            <button onClick={() => setModalAberto(true)}>ABRIR MODAL</button>
-            <Modal isOpen={modalAberto} onClose={() => setModalAberto(false)}>
-                <p>O conteúdo do Modal vai aqui!</p>
-            </Modal>
-        </div>
+        <main className="w-screen h-screen bg-gray-500">
+            <div className="flex justify-center self-center">
+                <button onClick={() => setModalAberto(true)}>ABRIR MODAL</button>
+                <Modal isOpen={modalAberto} onClose={() => setModalAberto(false)}>
+                    <p>Conteúdo do Modal</p>
+                </Modal>
+            </div>
+        </main>
     );
 }
