@@ -34,7 +34,6 @@ export default function RegisterPage() {
       });
 
       console.log("Sucesso:", response.data);
-      alert("Usuário cadastrado com sucesso!");
 
       // Limpar o formulário após o sucesso (opcional)
       setFormData({
@@ -52,7 +51,7 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="flex flex-col md:flex-row items-center justify-center min-h-screen bg-amber-50 px-10 md:px-20 pt-10 pb-0 w-full gap-20 md:gap-30">
+    <div className="flex flex-col md:flex-row items-center justify-center min-h-screen px-10 md:px-20 pt-10 pb-0 w-full gap-20 md:gap-30">
       {/* LADO ESQUERDO - FORMULÁRIO */}
       <div className="w-full md:w-1/2 flex flex-col items-center md:items-end justify-start h-screen">
         <form

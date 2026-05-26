@@ -20,7 +20,7 @@ interface Cadastro {
 export const postLogin = async (body: Login) => {
   try {
     const response = await api.post(`/login`, body);
-    return response.data;
+    return response.data.token;
   } catch (e: any) {
     throw new Error(e.message);
   }
