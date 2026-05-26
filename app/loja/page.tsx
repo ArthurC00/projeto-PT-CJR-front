@@ -1,5 +1,6 @@
 "use client"
 
+import Navbar from "@/components/navbar";
 import {useState} from "react";
 
 
@@ -18,6 +19,8 @@ export default function Tela_loja(){
     const [task, setTasks] = useState<Task[]>([]);
 
     return(
-        <div className = "flex items-center justify-center min-h-screen bg-black"></div>
+        <div className = "flex flex-col min-h-screen bg-black">
+            <Navbar/> 
+        </div>
     )
 }
