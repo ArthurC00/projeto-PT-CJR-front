@@ -1,3 +1,5 @@
+"use client"
+
 import Image from "next/image";
 import { redirect } from "next/navigation";
 import {api} from "../app/services/api"
