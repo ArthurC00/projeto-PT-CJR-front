@@ -276,7 +276,7 @@ export default function ProfilePage({ userId }: ProfilePageProps) {
           </section>
         </div>
       </div>
-      {openModal ? <EditarPerfil onClose={() => setOpenModal(false)}/> : null
+      {openModal ? <EditarPerfil onClose={() => setOpenModal(false)} userData={ userData }/> : null
         // alterei essa função para garantir que o modal não feche assim que a página carregar, apenas quando clicar em fechar
         }
     </div>

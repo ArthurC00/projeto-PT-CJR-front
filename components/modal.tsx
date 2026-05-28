@@ -22,7 +22,7 @@ export default function Modal({onClose, children}:modalTemplate) {
                 >
                     <button 
                     onClick={onClose}
-                    className="pointer-events-auto w-1/20 h-auto absolute top-8 right-8"
+                    className="pointer-events-auto w-1/20 h-auto absolute top-8 right-8 hover:opacity-50 transition"
                     // botão "fechar"
                     >
                         <Image

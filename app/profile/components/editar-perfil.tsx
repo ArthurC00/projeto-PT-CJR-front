@@ -1,13 +1,61 @@
 import Modal from "@/components/modal";
-import { useState } from "react";
+import Image from "next/image";
+import nonProfile from "../../../public/profile/nonProfile.png";
 
-
-
-export default function EditarPerfil({onClose}:any){
+export default function EditarPerfil({ onClose, userData }: any){
     return(
-        <Modal onClose={onClose}>
-            <div>
-                <h1>Editar Perfil</h1>
+        <Modal onClose={ onClose }>
+            <div className="flex flex-col items-center justify-center w-full h-full">
+                <div className="flex flex-col h-1/3 w-full items-center justify-center">
+                    <Image
+                        className="outline-5 outline-white rounded-full overflow-hidden h-full w-auto"
+                        src={ userData?.foto_perfil_url || nonProfile }
+                        alt="Foto de perfil"
+                        width={225}
+                        height={225}
+                        unoptimized
+                    />
+                    <button className="h-1/3 w-auto -mt-4 hover:scale-108 transition">
+                        <div className="w-full h-full p-2 bg-white rounded-full overflow-hidden">
+                            <Image 
+                            className="w-full h-full"
+                            src="/images/icone_camera.png"
+                            alt="Foto de perfil"
+                            width={38}
+                            height={38}
+                            />
+                        </div>
+                    </button>
+                </div>
+                <form className="flex flex-col items-center justify-center w-full h-1/3 p-2">
+                    <input
+                        name="nome"
+                        placeholder="Nome"
+                        defaultValue={ userData?.nome || "" }
+                        aria-label="Nome"
+                        className="bg-white text-black rounded-full my-1 h-10 w-3/4 pl-2"
+                    />
+                    <input
+                        name="username"
+                        placeholder="Username"
+                        defaultValue= { userData?.username || "" }
+                        aria-label="Nome de usuário"
+                        className="bg-white text-black rounded-full my-1 h-10 w-3/4 pl-2"
+                    />
+                    <input
+                        type="email"
+                        name="email"
+                        placeholder="Email"
+                        defaultValue= { userData?.email || "" }
+                        aria-label="E-mail"
+                        className="bg-white text-black rounded-full my-1 h-10 w-3/4 pl-2"
+                    />
+                </form>
+                <div className="flex flex-col items-center justify-center w-full h-1/3 p-2">
+                    <button className="rounded-full my-1 h-10 w-3/4 outline-2 outline-[#AF052A] text-[#AF052A] shadow-md hover:scale-102 transition">Deletar Conta</button>
+                    <button className="rounded-full my-1 h-10 w-3/4 outline-2 outline-[#6A38F3] text-[#6A38F3] shadow-md hover:scale-102 transition">Alterar Senha</button>
+                    <button className="rounded-full my-1 h-10 w-3/4 outline-2 outline-[#6A38F3] bg-[#6A38F3] text-white shadow-md hover:scale-102 transition">Salvar</button>
+                </div>
             </div>
         </Modal>
     );
