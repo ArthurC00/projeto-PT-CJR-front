@@ -4,22 +4,27 @@ import Image from "next/image";
 // esse aqui é um template de modal reutilizável que eu criei pra usar nos modais "editar perfil" e "alterar senha"
 
 interface modalTemplate {
-    isOpen: boolean; // true = modal aberto (mostrar); false = modal fechado (esconder);
     onClose: () => void; // só aceita uma função com retorno vazio (serve para fechar o modal)
     children: ReactNode; // ReactNode é o tipo de variável que recebe o conteúdo do modal (HTML, CSS ou qualquer coisa que o React aceite)
 }
 
-export default function Modal({ isOpen, onClose, children}: modalTemplate) {
+export default function Modal({onClose, children}:modalTemplate) {
     // passa os parâmetros estabelecidos no template para a função modal
-    if (!isOpen) {
-        return null;
-    } else {
         return (
-            <div className="fixed inset-0 flex items-center justify-center backdrop-blur-xs">
-                <div className="relative flex items-center justify-center h-[85vh] w-[35vw] p-8 justify-self-center self-center text-black rounded-4xl bg-[#EDEDED]">
+            <div className="fixed inset-0 z-50 flex items-center justify-center">
+                <div
+                    // fundo borrado que fecha o modal ao clicar
+                    className="absolute z-10 inset-0 backdrop-blur-xs bg-black/20"
+                    onClick={onClose}
+                />
+                <div className="relative z-20 flex items-center h-[85vh] w-[35vw] p-8 rounded-4xl bg-[#EDEDED]"
+                    // caixa do modal
+                >
                     <button 
                     onClick={onClose}
-                    className="w-1/20 h-auto absolute top-8 right-8">
+                    className="pointer-events-auto w-1/20 h-auto absolute top-8 right-8"
+                    // botão "fechar"
+                    >
                         <Image
                             className="w-full h-auto"
                             width={512}
@@ -29,10 +34,9 @@ export default function Modal({ isOpen, onClose, children}: modalTemplate) {
                         />
                     </button>
                     <div className="w-full h-full justify-items-center items-center">
-                        {children} {/* aqui é onde vai o conteúdo do modal, armazenado em children */}
+                        {children}
                     </div>
                 </div>
             </div>
         )
     }
-}
