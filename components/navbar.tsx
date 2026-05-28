@@ -43,7 +43,7 @@ export default function Navbar() {
     <nav className="flex justify-between min-h-15 min-w-screen bg-black justify-items-center ">
       <h1>
         <Image
-          className="top-3 left-4"
+          className="relative top-3 left-4"
           src="/logobranca.png"
           alt="logo"
           width={150}
