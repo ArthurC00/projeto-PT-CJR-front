@@ -10,13 +10,13 @@ import { postLogin } from "../services/api";
 import { decodeUserToken } from "../utils/auth";
 
 export default function Login() {
-  const [email, setEmail] = useState(""); // integração
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const router = useRouter();
   const searchParams = useSearchParams();
 
   const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault(); // impede que a página recarregue
+    e.preventDefault();
 
     try {
       const token = await postLogin({ email: email, senha_hash: password });
@@ -43,64 +43,76 @@ export default function Login() {
     }
   };
 
-  // a partir desse ponto é a própria tela de login
   return (
-    <main className="bg-[#F6F3E4] flex flex-row items-center justify-center justify-items-center h-screen w-screen">
-      <div className="h-screen w-[50vw] justify-items-center">
+    <main className="flex flex-col md:flex-row items-center justify-center min-h-screen w-full overflow-hidden">
+      <div className="w-full px-10 md:w-1/2 flex flex-col items-center justify-center py-8 md:py-0 md:h-screen">
         <Image
-          className="w-auto h-1/4 self-center"
+          className="w-full md:w-auto md:h-1/4 mb-4 md:mb-0"
           src="/images/logo_stock.io.png"
           width={421}
           height={222}
           alt="Logo Stock.io"
         />
         <Image
-          className="h-3/4 w-auto self-end"
+          className="hidden md:block h-3/4 w-[512px] self-center"
           src="/images/stockles_caixa.png"
           width={514}
           height={802}
           alt="Mascote Stockles segurando uma caixa."
         />
       </div>
-      <div className="h-[85vh] w-[50vw] bg-[#171918] mr-16 pt-12 rounded-t-4xl text-center justify-self-start justify-center place-items-center font-sans self-end">
-        <h1 className="font-black text-4xl m-6 tracking-wide">
+
+      <div className="w-[90%] md:w-1/2 md:max-w-xl bg-[#171918] flex flex-col items-center justify-center md:pt-0 pt-12 pb-16 md:pb-0 px-4 rounded-t-4xl md:rounded-t-4xl md:mr-8 lg:mr-16 md:h-[85vh] shadow-2xl mt-auto md:mt-0 md:self-end">
+        <h1 className="text-white font-black text-3xl md:text-4xl m-6 text-center">
           BEM VINDO DE VOLTA!
         </h1>
-        <form onSubmit={handleLogin} className="flex flex-col w-5/6">
+        <form
+          onSubmit={handleLogin}
+          className="flex flex-col w-full max-w-sm text-white"
+        >
           <input
             required
             type="email"
-            value={email} // integração com React
-            onChange={(e) => setEmail(e.target.value)} // integração com React
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             name="email"
             placeholder="Email"
             aria-label="E-mail"
-            className="bg-[#FFFFFF] text-black rounded-full my-3 h-10 w-full pl-8"
+            className="bg-[#FFFFFF] text-black rounded-full my-3 h-12 w-full pl-8 focus:outline-none focus:ring-2 focus:ring-[#6A38F3]"
           />
           <input
             required
             type="password"
-            value={password} // integração com React
-            onChange={(e) => setPassword(e.target.value)} // integração com React
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             name="senha"
             placeholder="Senha"
             aria-label="Senha"
-            className="bg-[#FFFFFF] text-black rounded-full my-3 h-10 w-full pl-8"
+            className="bg-[#FFFFFF] text-black rounded-full my-3 h-12 w-full pl-8 focus:outline-none focus:ring-2 focus:ring-[#6A38F3]"
           />
-          <p className="m-4 font-thin text-md">
-            <Link href="/recuperar-conta" className="underline">
+
+          <p className="my-4 font-thin text-sm md:text-md text-right">
+            <Link
+              href="/recuperar-conta"
+              className="underline hover:text-gray-300 transition-colors"
+            >
               Esqueceu sua senha?
             </Link>
           </p>
+
           <button
             type="submit"
-            className="bg-[#6A38F3] font-bold rounded-full m-2 h-11"
+            className="bg-[#6A38F3] hover:bg-[#5b2cd6] transition-colors text-white font-bold rounded-full mt-2 mb-6 h-12 w-full"
           >
             ENTRAR
           </button>
-          <p className="text-start m-4 text-lg font-extralight">
+
+          <p className="text-center md:text-start text-sm md:text-lg font-extralight">
             Não possui uma conta?{" "}
-            <Link href="/cadastro" className="text-[#6A38F3] font-medium">
+            <Link
+              href="/cadastro"
+              className="text-[#6A38F3] font-medium hover:underline"
+            >
               Cadastre-se
             </Link>
           </p>
