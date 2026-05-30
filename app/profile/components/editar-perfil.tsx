@@ -7,7 +7,6 @@ import { EditarUsuario } from "@/app/services/api";
 export default function EditarPerfil({ onClose, userData }: any){
 
     const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
-        // e.preventDefault();
 
         const formData = new FormData(e.currentTarget);
         const data = Object.fromEntries(formData.entries());
