@@ -1,8 +1,27 @@
 import Modal from "@/components/modal";
 import Image from "next/image";
 import nonProfile from "../../../public/profile/nonProfile.png";
+import { editUser } from "@/app/services/api";
+import { EditarUsuario } from "@/app/services/api";
 
 export default function EditarPerfil({ onClose, userData }: any){
+
+    const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
+        // e.preventDefault();
+
+        const formData = new FormData(e.currentTarget);
+        const data = Object.fromEntries(formData.entries());
+
+        const usuario: EditarUsuario = {
+            nome: data.nome as string,
+            username: data.username as string,
+            email: data.email as string,
+            foto_perfil_url: data.foto_perfil_url as string || userData.foto_perfil_url
+        };
+
+        await editUser(userData?.id, usuario);
+    }
+
     return(
         <Modal onClose={ onClose }>
             <div className="flex flex-col items-center justify-center w-full h-full">
@@ -27,7 +46,7 @@ export default function EditarPerfil({ onClose, userData }: any){
                         </div>
                     </button>
                 </div>
-                <form className="flex flex-col items-center justify-center w-full h-1/3 p-2">
+                <form id="editar-perfil" onSubmit={handleSave} className="flex flex-col items-center justify-center w-full h-1/3 p-2">
                     <input
                         name="nome"
                         placeholder="Nome"
@@ -54,7 +73,7 @@ export default function EditarPerfil({ onClose, userData }: any){
                 <div className="flex flex-col items-center justify-center w-full h-1/3 p-2">
                     <button className="rounded-full my-1 h-10 w-3/4 outline-2 outline-[#AF052A] text-[#AF052A] shadow-md hover:scale-102 transition">Deletar Conta</button>
                     <button className="rounded-full my-1 h-10 w-3/4 outline-2 outline-[#6A38F3] text-[#6A38F3] shadow-md hover:scale-102 transition">Alterar Senha</button>
-                    <button className="rounded-full my-1 h-10 w-3/4 outline-2 outline-[#6A38F3] bg-[#6A38F3] text-white shadow-md hover:scale-102 transition">Salvar</button>
+                    <button form="editar-perfil" type="submit" className="rounded-full my-1 h-10 w-3/4 outline-4 -outline-offset-2 outline-[#6A38F3] bg-[#6A38F3] text-white shadow-md hover:scale-102 transition">Salvar</button>
                 </div>
             </div>
         </Modal>

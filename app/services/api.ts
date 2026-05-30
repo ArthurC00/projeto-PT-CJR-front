@@ -17,6 +17,13 @@ interface Cadastro {
   foto_perfil_url: string;
 }
 
+export interface EditarUsuario {
+  nome: string;
+  username: string;
+  email: string;
+  foto_perfil_url: string;
+}
+
 export const postLogin = async (body: Login) => {
   try {
     const response = await api.post(`/login`, body);
@@ -34,3 +41,18 @@ export const postCadastro = async (body: Cadastro) => {
     throw new Error(e.message);
   }
 };
+
+export const editUser = async (userId: number, body: EditarUsuario) => {
+  try {
+    const token = localStorage.getItem("token");
+
+    const response = await api.patch(`/usuarios/${userId}`, body, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+  });
+    return response.data;
+  } catch (e: any) {
+    throw new Error(e.response?.data?.message || e.message);
+  }
+}
