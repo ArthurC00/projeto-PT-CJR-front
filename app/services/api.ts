@@ -34,3 +34,12 @@ export const postCadastro = async (body: Cadastro) => {
     throw new Error(e.message);
   }
 };
+
+export const getOneProduct = async (id: string) => {
+  try {
+    const response = await api.get(`/produto/${id}`);
+    return response.data;
+  } catch (error: any) {
+    throw new Error(error.message);
+  }
+};
