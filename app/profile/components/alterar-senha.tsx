@@ -1,9 +1,33 @@
 import Modal from "@/components/modal";
 import Image from "next/image";
-
+import { updatePassword } from "@/app/services/api";
 
 export default function AlterarSenha({onClose, onBack, userData, width, height }:any){
-    
+    const handleSaveSenha = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        const formData = new FormData(e.currentTarget);
+        const senhaAntiga = formData.get("senha") as string;
+        const novaSenha = formData.get("nova_senha") as string;
+        const confirmarSenha = formData.get("confirmar_senha") as string;
+
+        if (novaSenha !== confirmarSenha) {
+            alert("A nova senha e a confirmação devem ser iguais");
+            return;
+        }
+
+        if (novaSenha.length < 1) {
+            alert("A senha não pode estar vazia")
+            return;
+        }
+
+        try {
+            await updatePassword(userData.id, {senhaAntiga, novaSenha});
+            alert("Senha alterada com sucesso");
+        } catch (error) {
+            alert("Senha antiga incorreta ou erro no servidor");
+        }
+    }
+
     return(
         <Modal onClose={onClose} width={width} height={height}>
             <button 
