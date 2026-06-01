@@ -2,6 +2,12 @@ import { ReactNode } from "react";
 import Image from "next/image";
 
 // esse aqui é um template de modal reutilizável que eu criei pra usar nos modais "editar perfil" e "alterar senha"
+// ao usar, precisa passar esses parâmetros na tag de abertura <Modal>:
+    // onClose: o que deve acontecer quando clicar no botão "fechar" do modal
+    // children: todo o conteúdo HTML, é só colocar assim: <Modal><h1>seu HMTL aqui</h1></Modal>
+    // height: altura que a caixinha do modal ocupa na tela (recomendo usar o formato vh, que é uma porcentagem da altura da tela visível)
+    // width: largura que a caixinha do modal ocupa na tela (recomendo usar o formato vw, que é uma porcentagem da largura da tela visível)
+// se tiver dúvidas pode me mencionar no whatsapp ou no slack!! espero que o template ajude
 
 interface modalTemplate {
     onClose: () => void; // só aceita uma função com retorno vazio (serve para fechar o modal)
