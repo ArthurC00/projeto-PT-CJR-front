@@ -24,7 +24,7 @@ interface ProfilePageProps {
 
 export default function ProfilePage({ userId }: ProfilePageProps) {
   const [editProfileButton, setEditProfileButton] = useState(false);
-  const [openModal, setOpenModal] = useState(false);
+  const [openEditarPerfil, setOpenEditarPerfil] = useState(false);
   const [userData, setUserData] = useState<UserDataProps>();
   const [myId, setMyId] = useState<number>(0);
   const [error, setError] = useState(false);
@@ -102,8 +102,8 @@ export default function ProfilePage({ userId }: ProfilePageProps) {
     setEditProfileButton(isOwner);
   }, [isOwner]);
 
-  const handleModal = () => {
-    setOpenModal(!openModal)
+  const handleEditarPerfil = () => {
+    setOpenEditarPerfil(!openEditarPerfil)
   }
 
   if (error) {
@@ -158,7 +158,7 @@ export default function ProfilePage({ userId }: ProfilePageProps) {
             <div className="mt-10 md:ml-auto md:self-center">
               <button
                 className="w-[324px] h-[43.32px] bg-purple-600 text-white rounded-full font-medium hover:scale-102 transition"
-                onClick={ handleModal }
+                onClick={ handleEditarPerfil }
               >
                 Editar Perfil
               </button>
@@ -276,7 +276,7 @@ export default function ProfilePage({ userId }: ProfilePageProps) {
           </section>
         </div>
       </div>
-      {openModal ? <EditarPerfil onClose={() => setOpenModal(false)} userData={ userData }/> : null
+      {openEditarPerfil ? <EditarPerfil onClose={() => setOpenEditarPerfil(false)} userData={ userData } height="85vh" width="35vw"/> : null
         // alterei essa função para garantir que o modal não feche assim que a página carregar, apenas quando clicar em fechar
         }
     </div>

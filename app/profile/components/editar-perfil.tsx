@@ -3,10 +3,14 @@ import Image from "next/image";
 import nonProfile from "../../../public/profile/nonProfile.png";
 import { editUser } from "@/app/services/api";
 import { EditarUsuario } from "@/app/services/api";
+import { useState } from "react";
+import AlterarSenha from "./alterar-senha";
 
-export default function EditarPerfil({ onClose, userData }: any){
+export default function EditarPerfil({ onClose, userData, height, width }: any){
+    const [openAlterarSenha, setOpenAlterarSenha] = useState(false);
 
     const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
+        // e.preventDefault();
 
         const formData = new FormData(e.currentTarget);
         const data = Object.fromEntries(formData.entries());
@@ -21,8 +25,13 @@ export default function EditarPerfil({ onClose, userData }: any){
         await editUser(userData?.id, usuario);
     }
 
+    const handleCloseAll = () => {
+        setOpenAlterarSenha(false); // fecha o alterar senha
+        onClose(); // fecha o próprio editar perfil
+    }
+
     return(
-        <Modal onClose={ onClose }>
+        <Modal onClose={ onClose } height={height} width={width}>
             <div className="flex flex-col items-center justify-center w-full h-full">
                 <div className="flex flex-col h-1/3 w-full items-center justify-center">
                     <Image
@@ -33,7 +42,10 @@ export default function EditarPerfil({ onClose, userData }: any){
                         height={225}
                         unoptimized
                     />
-                    <button className="h-1/3 w-auto -mt-4 hover:scale-108 transition">
+                    <button
+                        className="h-1/3 w-auto -mt-4 hover:scale-108 transition"
+                        // onClick={() => document.getElementById('upload-foto')?.click()} // clica no input de upload da foto quando clicar no ícone de câmera
+                    >
                         <div className="w-full h-full p-2 bg-white rounded-full overflow-hidden">
                             <Image 
                             className="w-full h-full"
@@ -46,6 +58,12 @@ export default function EditarPerfil({ onClose, userData }: any){
                     </button>
                 </div>
                 <form id="editar-perfil" onSubmit={handleSave} className="flex flex-col items-center justify-center w-full h-1/3 p-2">
+                    {/*<input
+                        type="text"
+                        id="upload-foto"
+                        // style={{ display: 'none' }} // faz com que o input seja invisível
+                        name="foto_perfil_url"
+                    />*/}
                     <input
                         name="nome"
                         placeholder="Nome"
@@ -71,10 +89,11 @@ export default function EditarPerfil({ onClose, userData }: any){
                 </form>
                 <div className="flex flex-col items-center justify-center w-full h-1/3 p-2">
                     <button className="rounded-full my-1 h-10 w-3/4 outline-2 outline-[#AF052A] text-[#AF052A] shadow-md hover:scale-102 transition">Deletar Conta</button>
-                    <button className="rounded-full my-1 h-10 w-3/4 outline-2 outline-[#6A38F3] text-[#6A38F3] shadow-md hover:scale-102 transition">Alterar Senha</button>
+                    <button onClick={() => setOpenAlterarSenha(true)} className="rounded-full my-1 h-10 w-3/4 outline-2 outline-[#6A38F3] text-[#6A38F3] shadow-md hover:scale-102 transition">Alterar Senha</button>
                     <button form="editar-perfil" type="submit" className="rounded-full my-1 h-10 w-3/4 outline-4 -outline-offset-2 outline-[#6A38F3] bg-[#6A38F3] text-white shadow-md hover:scale-102 transition">Salvar</button>
                 </div>
             </div>
+            { openAlterarSenha ? <AlterarSenha onClose={handleCloseAll} onBack={() => setOpenAlterarSenha(false)} userData={ userData } height="75vh" width="25vw"/> : null }
         </Modal>
     );
 }
