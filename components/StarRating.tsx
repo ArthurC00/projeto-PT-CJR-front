@@ -14,10 +14,7 @@ export default function StarRating({ rating, onRatingChange }: StarRatingProps) 
 
   return (
     <div className="flex flex-col items-center gap-2 select-none">
-      <span className="text-[#F6F3E4] text-4xl font-medium tracking-wide">
-        {rating.toFixed(2)}
-      </span>
-
+      
       <div className="flex items-center gap-1">
         {[1, 2, 3, 4, 5].map((starIndex) => {
           const fillPercentage = Math.max(0, Math.min(1, displayRating - (starIndex - 1)));
