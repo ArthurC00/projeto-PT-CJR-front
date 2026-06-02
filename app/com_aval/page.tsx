@@ -35,7 +35,6 @@ export default function com_aval(){
 
         <div className="bg-black w-full pt-24 pb-12 flex flex-col items-center justify-start px-4">
 
-            {/* Card do comentário clicado aparecendo aqui dentro da parte preta */}
             <div className="bg-[#F6F3E4] text-black p-6 rounded-2xl w-full max-w-[600px] shadow-lg">
             <div className="flex justify-between items-center mb-4">
                 <div>
@@ -54,10 +53,8 @@ export default function com_aval(){
         </Link>  
         </div>
 
-        {/* PARTE BEGE: Respostas a este comentário */}
       <main className="w-full max-w-[600px] mx-auto px-4 py-8 flex-1 flex flex-col gap-6">
         
-        {/* Formulário para criar uma resposta */}
         <form onSubmit={lidarComEnvio} className="flex flex-col gap-3">
           <label className="text-black font-semibold text-sm">
             Responder a este comentário:
