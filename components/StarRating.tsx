@@ -3,7 +3,7 @@
 import { useState } from "react";
 
 interface StarRatingProps {
-  rating: number; // Ex: 4.75
+  rating: number; 
   onRatingChange?: (newRating: number) => void;
 }
 

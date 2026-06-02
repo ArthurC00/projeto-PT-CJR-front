@@ -6,7 +6,8 @@ import { useState, useEffect } from "react";
 import garotas from "../../public/imagem_loja.svg"
 import escuro from "../../public/telaloja_degrade.svg"
 import nome from "../../public/rareBeauty_loja.png"
-import StarRating from "@/components/StarRating"; 
+import StarRating from "@/components/StarRating";
+import Link from 'next/link'; 
 
 type Review = {
     id: number;
@@ -150,15 +151,23 @@ export default function Tela_loja(){
                 {/* lista de comentários */}
                 <div className="w-[600px] flex flex-col gap-4 mt-8">
                     {reviews.map((rev) => (
-                        <div 
+                        <Link 
                             key={rev.id} 
-                            className="bg-[#F6F3E4] text-black w-full rounded-2xl p-5 flex flex-col gap-3 shadow-lg"
+                            href={{
+                                pathname: '/com_aval',
+                                query: {
+                                name: rev.userName,
+                                text: rev.comment || "Os produtos são simplesmente perfeitos...", // Use o campo correto do seu objeto
+                                rating: rev.userRating
+                                }
+                            }}
+                            className="bg-[#F6F3E4] text-black w-full rounded-2xl block hover:opacity-90 transition-opacity cursor-pointer p-4"
                         >
                             {/* Cabeçalho do Card */}
                             <div className="flex items-start justify-between w-full">
                                 <div className="flex items-center gap-4">
-                                    <div className="w-12 h-12 bg-neutral-300 rounded-full overflow-hidden flex items-center justify-center font-bold text-neutral-600 shrink-0">
-                                        {rev.userName ? rev.userName.charAt(0).toUpperCase() : "?"}
+                                    <div className="w-12 h-12 bg-neutral-300 rounded-full overflow-hidden flex items-center justify-center font-bold">
+                                        {rev.userName ? rev.userName.charAt(0).toUpperCase() : "U"}
                                     </div>
                                     
                                     <div className="flex flex-col">
@@ -178,7 +187,7 @@ export default function Tela_loja(){
                                     "{rev.comment}"
                                 </p>
                             </div>
-                        </div>
+                        </Link>
                     ))}
 
                     {reviews.length === 0 && (
