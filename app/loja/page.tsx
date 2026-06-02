@@ -2,24 +2,22 @@
 
 import Navbar from "@/components/navbar";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react"; 
 import garotas from "../../public/imagem_loja.svg"
 import escuro from "../../public/telaloja_degrade.svg"
 import nome from "../../public/rareBeauty_loja.png"
 import StarRating from "@/components/StarRating"; 
 
-// 1. Tipagem atualizada incluindo o comentário
 type Review = {
     id: number;
     userName: string;
     userRating: number;
-    comment: string; // <-- Novo campo
+    comment: string;
     createdAt: string;
 }
 
 export default function Tela_loja(){
-    // Estado com um exemplo inicial completo
-    const [reviews, setReviews] = useState<Review[]>([
+    const reviewPadrao: Review[] = [
         { 
             id: 1, 
             userName: "Sofia Figueiredo", 
@@ -27,13 +25,34 @@ export default function Tela_loja(){
             comment: "Os produtos são simplesmente perfeitos! A pigmentação do blush é surreal de boa, vale cada centavo.",
             createdAt: "01/06/2026" 
         }
-    ]);
+    ];
+
+    const [reviews, setReviews] = useState<Review[]>([]);
     
     const [inputName, setInputName] = useState("");
     const [inputComment, setInputComment] = useState(""); 
     const [userSelectedRating, setUserSelectedRating] = useState(5);
 
-    const [storeRating, setStoreRating] = useState<number>(4.75);
+    useEffect(() => {
+        const comentariosSalvos = localStorage.getItem("@rareBeauty:reviews");
+        if (comentariosSalvos) {
+            setReviews(JSON.parse(comentariosSalvos));
+        } else {
+            setReviews(reviewPadrao);
+        }
+    }, []);
+
+    useEffect(() => {
+        if (reviews.length > 0) {
+            localStorage.setItem("@rareBeauty:reviews", JSON.stringify(reviews));
+        }
+    }, [reviews]);
+
+    const calcularMedia = (listaDeReviews: Review[]) => {
+        if (listaDeReviews.length === 0) return 0;
+        const soma = listaDeReviews.reduce((acc, rev) => acc + rev.userRating, 0);
+        return soma / listaDeReviews.length;
+    };
 
     const handleAddReview = (e: React.FormEvent) => {
         e.preventDefault();
@@ -43,16 +62,19 @@ export default function Tela_loja(){
             id: Date.now(),
             userName: inputName,
             userRating: userSelectedRating,
-            comment: inputComment, // <-- Salvando o comentário
+            comment: inputComment,
             createdAt: new Date().toLocaleDateString('pt-BR')
         };
 
-        setReviews([newReview, ...reviews]);
+        const listaAtualizada = [newReview, ...reviews];
+        setReviews(listaAtualizada);
         
         setInputName("");
         setInputComment("");
         setUserSelectedRating(5);
     };
+
+    const storeRating = calcularMedia(reviews);
 
     return (
         <div className="relative flex flex-col min-h-screen bg-black min-w-[1200px] overflow-x-auto">
@@ -71,16 +93,18 @@ export default function Tela_loja(){
                 </div>
             </div>
 
-            {/* reviws e média */}
+            {/* reviews e média */}
             <div className="bg-black w-full py-12 flex flex-col items-center justify-center gap-6">
                 <h2 className="text-[#F6F3E4] text-3xl font-semibold tracking-wide">Reviews e Comentários</h2>
                 
                 <div className="flex flex-col items-center gap-2">
-                    <span className="text-[#F6F3E4] text-5xl font-bold decoration-1 underline-offset-8">{storeRating.toFixed(2)}</span>
+                    <span className="text-[#F6F3E4] text-5xl font-bold decoration-1 underline-offset-8">
+                        {storeRating.toFixed(2)}
+                    </span>
                     <StarRating rating={storeRating} />
                 </div>
 
-                {/* formulário - campo de comentário */}
+                {/* formulário */}
                 <form onSubmit={handleAddReview} className="w-[600px] mt-6 p-6 border border-[#F6F3E4]/20 rounded-xl bg-neutral-900/50 flex flex-col gap-4">
                     <h3 className="text-[#F6F3E4] text-lg font-medium">Deixe sua avaliação</h3>
                     
@@ -96,7 +120,7 @@ export default function Tela_loja(){
                         />
                     </div>
 
-                    {/* Novo Input do Comentário */}
+                    {/* Input do Comentário */}
                     <div className="flex flex-col gap-1">
                         <label className="text-[#F6F3E4]/70 text-sm">Seu Comentário</label>
                         <textarea 
@@ -123,21 +147,18 @@ export default function Tela_loja(){
                     </div>
                 </form>
 
-                ---
-
-                {/* lista de comentário com texto exibido */}
+                {/* lista de comentários */}
                 <div className="w-[600px] flex flex-col gap-4 mt-8">
                     {reviews.map((rev) => (
                         <div 
                             key={rev.id} 
                             className="bg-[#F6F3E4] text-black w-full rounded-2xl p-5 flex flex-col gap-3 shadow-lg"
                         >
-                            {/* Cabeçalho do Card (Foto, Nome e Estrelas) */}
+                            {/* Cabeçalho do Card */}
                             <div className="flex items-start justify-between w-full">
                                 <div className="flex items-center gap-4">
-                                    {/* Avatar */}
                                     <div className="w-12 h-12 bg-neutral-300 rounded-full overflow-hidden flex items-center justify-center font-bold text-neutral-600 shrink-0">
-                                        {rev.userName.charAt(0).toUpperCase()}
+                                        {rev.userName ? rev.userName.charAt(0).toUpperCase() : "?"}
                                     </div>
                                     
                                     <div className="flex flex-col">
@@ -146,13 +167,12 @@ export default function Tela_loja(){
                                     </div>
                                 </div>
 
-                                {/* Estrelas do usuário */}
                                 <div className="shrink-0">
                                     <StarRating rating={rev.userRating} />
                                 </div>
                             </div>
 
-                            {/* Corpo do Card: Texto do Comentário */}
+                            {/* Corpo do Card */}
                             <div className="pl-16"> 
                                 <p className="text-neutral-700 text-sm leading-relaxed break-words">
                                     "{rev.comment}"
