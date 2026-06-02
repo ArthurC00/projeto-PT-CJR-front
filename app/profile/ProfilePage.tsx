@@ -164,7 +164,7 @@ export default function ProfilePage({ userId }: ProfilePageProps) {
             <h2 className="text-[36px] font-medium text-black mb-6">
               Produtos
             </h2>
-            <div className="flex gap-8 p-2 overflow-x-auto scroll-smooth [&::-webkit-scrollbar]:h-0.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-black [&::-webkit-scrollbar-thumb]:rounded-full [scrollbar-width:thin] [scrollbar-color:black_transparent]">
+            <div className="flex gap-8 p-2 overflow-x-auto scroll-smooth [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:display-none [&::-webkit-scrollbar]:hidden">
               {products.map((product, index) => (
                 <div
                   key={index}
