@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export const  api = axios.create({
+export const api = axios.create({
   baseURL: "http://localhost:3001",
 });
 
@@ -42,22 +42,34 @@ export const postCadastro = async (body: Cadastro) => {
   }
 };
 
+export const getOneProduct = async (id: string) => {
+  try {
+    const response = await api.get(`/produto/${id}`);
+    return response.data;
+  } catch (error: any) {
+    throw new Error(error.message);
+  }
+};
+
 export const editUser = async (userId: number, body: EditarUsuario) => {
   try {
     const token = localStorage.getItem("token");
 
     const response = await api.patch(`/usuarios/${userId}`, body, {
       headers: {
-        Authorization: `Bearer ${token}`
-      }
+        Authorization: `Bearer ${token}`,
+      },
     });
-    alert("Alterações salvas")
+    alert("Alterações salvas");
     return response.data;
   } catch (e: any) {
     throw new Error(e.response?.data?.message || e.message);
   }
-}
+};
 
-export const updatePassword = async (id: number, {oldPassword, newPassword}: any) => {
+export const updatePassword = async (
+  id: number,
+  { oldPassword, newPassword }: any,
+) => {
   // parei aqui pq não sabia se isso ainda era da minha task ou se era da integração do perfil
-}
+};

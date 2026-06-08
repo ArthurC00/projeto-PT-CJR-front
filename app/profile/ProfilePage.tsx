@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import Image from "next/image";
 import Navbar from "../../components/navbar";
@@ -11,6 +11,7 @@ import { useEffect, useState } from "react";
 import { getOneUser } from "../services/usersApi";
 import { decodeUserToken } from "../utils/auth";
 import EditarPerfil from "./components/editar-perfil";
+import ProductStars from "@/components/productStart";
 
 interface Product {
   name: string;
@@ -53,38 +54,6 @@ export default function ProfilePage({ userId }: ProfilePageProps) {
     }
   }, [userId]);
 
-  const productStars = (rating: number) => {
-    const validRating = Math.min(Math.max(rating, 0), 5);
-    return (
-      <div className="flex items-center gap-1 text-[#FFEB3A]">
-        {Array.from({ length: 5 }).map((_, index) => {
-          const starValue = Math.min(Math.max(validRating - index, 0), 1);
-          const scaleSize = starValue > 0 ? Math.max(starValue, 0.5) : 0;
-
-          return (
-            <div
-              key={index}
-              className="w-5 h-5 flex items-center justify-center"
-            >
-              <div
-                className="flex items-center justify-center transition-transform duration-200"
-                style={{ transform: `scale(${scaleSize})` }}
-              >
-                <Star
-                  size={20}
-                  fill={
-                    starValue === 1 ? "#FFEB3A" : "oklch(87.2% 0.01 258.338)"
-                  }
-                  stroke="#000000"
-                  strokeWidth={0.5}
-                />
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    );
-  };
   // Dados dos produtos copiados Figma
   const products: Product[] = [
     { name: "Bronzer", price: "R$254,99", available: true },
@@ -103,8 +72,8 @@ export default function ProfilePage({ userId }: ProfilePageProps) {
   }, [isOwner]);
 
   const handleEditarPerfil = () => {
-    setOpenEditarPerfil(!openEditarPerfil)
-  }
+    setOpenEditarPerfil(!openEditarPerfil);
+  };
 
   if (error) {
     return (
@@ -158,7 +127,7 @@ export default function ProfilePage({ userId }: ProfilePageProps) {
             <div className="mt-10 md:ml-auto md:self-center">
               <button
                 className="w-[324px] h-[43.32px] bg-purple-600 text-white rounded-full font-medium hover:scale-102 transition"
-                onClick={ handleEditarPerfil }
+                onClick={handleEditarPerfil}
               >
                 Editar Perfil
               </button>
@@ -260,7 +229,7 @@ export default function ProfilePage({ userId }: ProfilePageProps) {
                     Selena Gomez
                   </h4>
                   <div className="flex bg-slate-50 p-2 rounded-md gap-1 text-[#FFEB3A] items-center">
-                    {productStars(3.8)}
+                    <ProductStars rating={3} />
                   </div>
                 </div>
                 <p className="text-[24px] font-extralight text-black text-justify mt-4 leading-normal">
@@ -276,10 +245,17 @@ export default function ProfilePage({ userId }: ProfilePageProps) {
           </section>
         </div>
       </div>
-      {openEditarPerfil ? <EditarPerfil onClose={() => setOpenEditarPerfil(false)} userData={ userData } height="85vh" width="35vw"/> : null
+      {
+        openEditarPerfil ? (
+          <EditarPerfil
+            onClose={() => setOpenEditarPerfil(false)}
+            userData={userData}
+            height="85vh"
+            width="35vw"
+          />
+        ) : null
         // alterei essa função para garantir que o modal não feche assim que a página carregar, apenas quando clicar em fechar
-        }
+      }
     </div>
-
   );
 }
