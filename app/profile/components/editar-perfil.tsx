@@ -39,6 +39,7 @@ export default function EditarPerfil({ onClose, userData, height, width }: any){
         if (usuarioConfirma) {
             await deleteUser(userData?.id);
         }
+        window.location.reload();
     }
 
     return(
@@ -99,7 +100,7 @@ export default function EditarPerfil({ onClose, userData, height, width }: any){
                     />
                 </form>
                 <div className="flex flex-col items-center justify-center w-full h-1/3 p-2">
-                    <button className="rounded-full my-1 h-10 w-3/4 outline-2 outline-[#AF052A] text-[#AF052A] shadow-md hover:scale-102 transition">Deletar Conta</button>
+                    <button onClick={handleDelete} className="rounded-full my-1 h-10 w-3/4 outline-2 outline-[#AF052A] text-[#AF052A] shadow-md hover:scale-102 transition">Deletar Conta</button>
                     <button onClick={() => setOpenAlterarSenha(true)} className="rounded-full my-1 h-10 w-3/4 outline-2 outline-[#6A38F3] text-[#6A38F3] shadow-md hover:scale-102 transition">Alterar Senha</button>
                     <button form="editar-perfil" type="submit" className="rounded-full my-1 h-10 w-3/4 outline-4 -outline-offset-2 outline-[#6A38F3] bg-[#6A38F3] text-white shadow-md hover:scale-102 transition">Salvar</button>
                 </div>
