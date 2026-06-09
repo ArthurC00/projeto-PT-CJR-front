@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import Image from "next/image";
 import Navbar from "../../components/navbar";
@@ -11,6 +11,7 @@ import { useEffect, useState } from "react";
 import { getOneUser } from "../services/usersApi";
 import { decodeUserToken } from "../utils/auth";
 import ProductStars from "@/components/productStart";
+import EditarPerfil from "./components/editar-perfil";
 
 interface Product {
   name: string;
@@ -24,6 +25,7 @@ interface ProfilePageProps {
 
 export default function ProfilePage({ userId }: ProfilePageProps) {
   const [editProfileButton, setEditProfileButton] = useState(false);
+  const [openEditarPerfil, setOpenEditarPerfil] = useState(false);
   const [userData, setUserData] = useState<UserDataProps>();
   const [myId, setMyId] = useState<number>(0);
   const [error, setError] = useState(false);
@@ -69,6 +71,10 @@ export default function ProfilePage({ userId }: ProfilePageProps) {
     setEditProfileButton(isOwner);
   }, [isOwner]);
 
+  const handleEditarPerfil = () => {
+    setOpenEditarPerfil(!openEditarPerfil)
+  }
+
   if (error) {
     return (
       <div className="min-h-screen bg-[#F6F3E4] text-black overflow-y-auto pb-20 flex flex-col items-center justify-center">
@@ -79,8 +85,9 @@ export default function ProfilePage({ userId }: ProfilePageProps) {
       </div>
     );
   }
+
   return (
-    <div className="min-h-screen bg-[#F6F3E4] text-black overflow-y-auto pb-20">
+    <div className="z-0 min-h-screen bg-[#F6F3E4] text-black overflow-y-auto pb-20">
       <Navbar />
       <div className="bg-black h-[357px] w-full relative"></div>
 
@@ -120,7 +127,7 @@ export default function ProfilePage({ userId }: ProfilePageProps) {
             <div className="mt-10 md:ml-auto md:self-center">
               <button
                 className="w-[324px] h-[43.32px] bg-purple-600 text-white rounded-full font-medium hover:scale-102 transition"
-                onClick={() => console.log("Editar Perfil")}
+                onClick={ handleEditarPerfil }
               >
                 Editar Perfil
               </button>
@@ -128,7 +135,7 @@ export default function ProfilePage({ userId }: ProfilePageProps) {
           )}
         </section>
 
-        <div className="flex flex-col gap-[60px]">
+        <div className="z-10 flex flex-col gap-[60px]">
           <section>
             <h2 className="text-[36px] font-medium text-black mb-6">
               Produtos
@@ -238,6 +245,10 @@ export default function ProfilePage({ userId }: ProfilePageProps) {
           </section>
         </div>
       </div>
+      {openEditarPerfil ? <EditarPerfil onClose={() => setOpenEditarPerfil(false)} userData={ userData } height="85vh" width="35vw"/> : null
+        // alterei essa função para garantir que o modal não feche assim que a página carregar, apenas quando clicar em fechar
+        }
     </div>
+
   );
 }
