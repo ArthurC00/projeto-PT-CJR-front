@@ -113,6 +113,8 @@ export const getCategoriasRaiz = async () => {
   } catch (error: any) {
     throw new Error(error.message);
   }
+}
+
 export const editUser = async (userId: number, body: EditarUsuario) => {
   try {
     const token = localStorage.getItem("token");
