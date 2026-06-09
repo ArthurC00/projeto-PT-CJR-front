@@ -61,3 +61,20 @@ export const editUser = async (userId: number, body: EditarUsuario) => {
 export const updatePassword = async (id: number, {oldPassword, newPassword}: any) => {
   // parei aqui pq não sabia se isso ainda era da minha task ou se era da integração do perfil
 }
+
+export const deleteUser = async (userId: number) => {
+  try {
+    const token = localStorage.getItem("token");
+
+    const response = await api.delete(`/usuarios/${userId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+    alert("Conta deletada.")
+    return response.data;
+    
+  } catch (e: any) {
+    throw new Error(e.response?.data?.message || e.message);
+  }
+}

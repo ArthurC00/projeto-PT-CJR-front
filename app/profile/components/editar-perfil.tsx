@@ -2,6 +2,7 @@ import Modal from "@/components/modal";
 import Image from "next/image";
 import nonProfile from "../../../public/profile/nonProfile.png";
 import { editUser } from "@/app/services/api";
+import { deleteUser } from "@/app/services/api";
 import { EditarUsuario } from "@/app/services/api";
 import { useState } from "react";
 import AlterarSenha from "./alterar-senha";
@@ -28,6 +29,16 @@ export default function EditarPerfil({ onClose, userData, height, width }: any){
     const handleCloseAll = () => {
         setOpenAlterarSenha(false); // fecha o alterar senha
         onClose(); // fecha o próprio editar perfil
+    }
+
+    const handleDelete = async () => {
+        // e.preventDefault();
+        // motrar um alerta de confirmação
+        const usuarioConfirma = confirm("Tem certeza de que deseja excluir sua conta? Esta ação é irreversível.");
+
+        if (usuarioConfirma) {
+            await deleteUser(userData?.id);
+        }
     }
 
     return(
