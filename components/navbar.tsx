@@ -43,11 +43,13 @@ export default function Navbar() {
     <nav className="flex justify-between min-h-15 min-w-screen bg-black justify-items-center ">
       <h1>
         <Image
-          className="top-3 left-4"
+          className="relative top-4 left-14 h-9 w-auto object-contain"
           src="/logobranca.png"
           alt="logo"
-          width={150}
-          height={100}
+          // width={150}
+          // height={100}
+          width={221}
+          height={43}
         />
       </h1>
       <div className="justify-items-right bg-black grid grid-cols-2 gap-1 mr-7 mt-3">
@@ -63,11 +65,13 @@ export default function Navbar() {
     <nav className="flex justify-between min-h-15 min-w-screen bg-black justify-items-center ">
       <h1>
         <Image
-          className="relative top-3 left-4"
+          className="relative top-4 left-14 h-9 w-auto object-contain"
           src="/logobranca.png"
           alt="logo"
-          width={150}
-          height={100}
+          // width={150}
+          // height={100}
+          width={221}
+          height={43}
         />
       </h1>
       <div className="justify-items-right ">
