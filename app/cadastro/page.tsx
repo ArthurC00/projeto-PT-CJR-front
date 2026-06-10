@@ -1,7 +1,8 @@
 "use client";
 import React, { useState } from "react";
 import Image from "next/image";
-import api from "../services/api";
+import { postCadastro } from "../services/api";
+import Link from "next/link";
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -21,16 +22,15 @@ export default function RegisterPage() {
     e.preventDefault();
 
     try {
-      const response = await api.post("/usuarios", {
-        nome: formData.nomeCompleto, // O Back quer 'nome'
+      const response = await postCadastro({
+        nome: formData.nomeCompleto,
         username: formData.username,
         email: formData.email,
-        senha_hash: formData.senha, // O Back quer 'senha_hash'
-        foto_perfil_url: "", // O Back quer que seja uma string
+        senha_hash: formData.senha,
+        foto_perfil_url: "",
       });
 
       console.log("Sucesso:", response.data);
-      alert("Usuário cadastrado com sucesso!");
 
       // Limpar o formulário após o sucesso (opcional)
       setFormData({
@@ -41,14 +41,14 @@ export default function RegisterPage() {
         confirmarSenha: "",
       });
     } catch (error: any) {
-      const mensagemErro = error.response?.data?.message || "Erro desconhecido";
+      const mensagemErro = error || "Erro desconhecido";
       console.error("Detalhes do erro:", mensagemErro);
       alert("Erro ao cadastrar: " + mensagemErro);
     }
   };
 
   return (
-    <div className="flex flex-col md:flex-row items-center justify-center min-h-screen bg-amber-50 px-10 md:px-20 pt-10 pb-0 w-full gap-20 md:gap-30">
+    <div className="flex flex-col md:flex-row items-center justify-center min-h-screen px-10 md:px-20 pt-10 pb-0 w-full gap-20 md:gap-30">
       {/* LADO ESQUERDO - FORMULÁRIO */}
       <div className="w-full md:w-1/2 flex flex-col items-center md:items-end justify-start h-screen">
         <form
@@ -66,7 +66,7 @@ export default function RegisterPage() {
               onChange={handleChange}
               placeholder="Nome Completo"
               required
-              className="w-full py-3 px-6 rounded-full bg-[#F5F1DA] text-gray-700 outline-none focus:ring-2 focus:ring-indigo-500"
+              className="bg-[#FFFFFF] text-black rounded-full h-12 w-full pl-8 focus:outline-none focus:ring-2 focus:ring-[#6A38F3]"
             />
             <input
               name="username"
@@ -74,7 +74,7 @@ export default function RegisterPage() {
               onChange={handleChange}
               placeholder="Username"
               required
-              className="w-full py-3 px-6 rounded-full bg-[#F5F1DA] text-gray-700 outline-none focus:ring-2 focus:ring-indigo-500"
+              className="bg-[#FFFFFF] text-black rounded-full h-12 w-full pl-8 focus:outline-none focus:ring-2 focus:ring-[#6A38F3]"
             />
             <input
               name="email"
@@ -83,7 +83,7 @@ export default function RegisterPage() {
               onChange={handleChange}
               placeholder="Email"
               required
-              className="w-full py-3 px-6 rounded-full bg-[#F5F1DA] text-gray-700 outline-none focus:ring-2 focus:ring-indigo-500"
+              className="bg-[#FFFFFF] text-black rounded-full h-12 w-full pl-8 focus:outline-none focus:ring-2 focus:ring-[#6A38F3]"
             />
             <input
               name="senha"
@@ -92,7 +92,7 @@ export default function RegisterPage() {
               onChange={handleChange}
               placeholder="Senha"
               required
-              className="w-full py-3 px-6 rounded-full bg-[#F5F1DA] text-gray-700 outline-none focus:ring-2 focus:ring-indigo-500"
+              className="bg-[#FFFFFF] text-black rounded-full h-12 w-full pl-8 focus:outline-none focus:ring-2 focus:ring-[#6A38F3]"
             />
             <input
               name="confirmarSenha"
@@ -101,7 +101,7 @@ export default function RegisterPage() {
               onChange={handleChange}
               placeholder="Confirmar Senha"
               required
-              className="w-full py-3 px-6 rounded-full bg-[#F5F1DA] text-gray-700 outline-none focus:ring-2 focus:ring-indigo-500"
+              className="bg-[#FFFFFF] text-black rounded-full h-12 w-full pl-8 focus:outline-none focus:ring-2 focus:ring-[#6A38F3]"
             />
           </div>
 
@@ -112,11 +112,14 @@ export default function RegisterPage() {
             CADASTRAR
           </button>
 
-          <p className="w-full text-gray-400 mt-5 text-sm text-left">
+          <p className="text-start md:text-start text-sm md:text-lg pt-2 font-extralight">
             Já possui uma conta?{" "}
-            <span className="text-indigo-400 cursor-pointer hover:underline">
+            <Link
+              className="text-[#6A38F3] font-medium hover:underline"
+              href={"/login"}
+            >
               Login
-            </span>
+            </Link>
           </p>
         </form>
       </div>

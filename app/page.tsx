@@ -129,4 +129,6 @@ export default function RegisterPage() {
       </div>
     </div>
   );
+export default function App() {
+  redirect("/login");
 }
