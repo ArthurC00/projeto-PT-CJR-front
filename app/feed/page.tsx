@@ -44,7 +44,7 @@ export default async function FeedPage() {
           </h1>
           <div className="flex gap-4 overflow-auto mt-22 ml-30">
             {categorias.map((categoria: Categoria) => (
-              <a key={categoria.id} href={`/feed/categoriasDeslogado/${categoria.id}`}
+              <a key={categoria.id} href={`/feed/categorias/${categoria.id}`}
                   className="px-5 py-2 rounded-full bg-white text-blue-600 text-2xl hover:bg-gray-300">
                 {categoria.nome}
               </a>
@@ -59,39 +59,35 @@ export default async function FeedPage() {
       <div>
         <h1 className="text-black text-4xl font-bold ml-40 relative top-15 tracking-wider">
           Produtos{" "}
-          <Link
-            className="text-xl text-blue-500 hover:text-blue-900"
-            href={"/melhoresAvaliados"}
-          >
-            melhores avaliados
-          </Link>
         </h1>
 
         {produtos.length > 0 ? (
-          <div className="grid grid-cols-5 gap-2 mt-20 ml-10">
+          <div className="grid grid-cols-5 gap-2 mt-20 ml-20">
             {produtos.map((produto: Produto) => (
               <Link key={produto.id} href={`/produto/${produto.id}`}> 
-                <div className="border rounded p-2">
+                <div className="flex flex-col rounded-4xl object-cover bg-gray-100 w-70 h-90 justify-center items-center">
                   {produto.imagens && produto.imagens.length > 0 ? (
-                    <div>
-                    <img
-                      src={produto.imagens[0].url_imagem}
-                      alt={produto.nome}
-                      className="w-full object-cover rounded"
-                    />
+                    <div className="">
+                      <img
+                        src={produto.imagens[0].url_imagem}
+                        alt={produto.nome}
+                        className="object-contain max-w-50 max-h-50 rounded-2xl"
+                      />
                     </div>
                   ) : (
-                    <div className="w-full h-40 bg-gray-100 rounded flex items-center justify-center">
+                    <div className="w-50 h-50 bg-gray-100 rounded flex items-center justify-center mb-10">
                       <p className="text-gray-400 text-sm">sem imagem</p>
                     </div>
                   )}
-                  <p className="text-3xl text-black justify-center">{produto.nome}</p>
-                  <p className="text-blue-600 text-4xl font-bold">
-                    {Number(produto.preco).toLocaleString('pt-BR', {
-                      style: 'currency',
-                      currency: 'BRL'
-                    })}
-                  </p>
+                  <div className="mt-5">
+                    <p className="flex text-3xl text-black justify-center ">{produto.nome}</p>
+                    <p className="flex text-blue-600 text-4xl font-bold justify-center">
+                      {Number(produto.preco).toLocaleString('pt-BR', {
+                        style: 'currency',
+                        currency: 'BRL'
+                      })}
+                    </p>
+                  </div>
                 </div>
               </Link>
             ))}

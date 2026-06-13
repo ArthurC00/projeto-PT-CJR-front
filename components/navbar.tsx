@@ -42,13 +42,15 @@ export default function Navbar() {
   return isLogged ? (
     <nav className="flex justify-between min-h-15 min-w-screen bg-black justify-items-center ">
       <h1>
+        <Link href="/feed">
         <Image
-          className="top-3 left-4"
+          className="mt-4 ml-4"
           src="/logobranca.png"
           alt="logo"
           width={150}
           height={100}
         />
+        </Link>
       </h1>
       <div className="justify-items-right bg-black grid grid-cols-2 gap-1 mr-7 mt-3">
         <a className="" onClick={handleProfile}>
@@ -62,6 +64,7 @@ export default function Navbar() {
   ) : (
     <nav className="flex justify-between min-h-15 min-w-screen bg-black justify-items-center ">
       <h1>
+        <Link href = "/feed">
         <Image
           className="relative top-3 left-4"
           src="/logobranca.png"
@@ -69,6 +72,7 @@ export default function Navbar() {
           width={150}
           height={100}
         />
+        </Link>
       </h1>
       <div className="justify-items-right ">
         <Link

@@ -27,8 +27,8 @@ interface produtos {
 interface categorias {
   id: number;
   nome: string;
-  slug: string;
 }
+
 
 export interface Produto {
   id: number;
@@ -37,8 +37,8 @@ export interface Produto {
   categoria_id: number;
   categoria: {
   select: {
-    id: true,
-    nome: true,
+    id: number,
+    nome: string,
       }
     },
   imagens: {
@@ -50,8 +50,29 @@ export interface Produto {
 export interface Categoria {
   id: number;
   nome: string;
-  slug: string;
 }
+
+export interface CategoriaDetalhe {
+  id: number;
+  nome: string;
+  categoria_pai_id: number | null;
+  tipos: {
+    id: number;
+    nome: string;
+  }[];
+  todosOsProdutos: {
+    id: number;
+    nome: string;
+    preco: number;
+    categoria_id?: number;
+    imagens: {
+      url_imagem: string;
+      ordem: number;
+    }[];
+  }[];
+}
+
+
 
 
 export const postLogin = async (body: Login) => {
@@ -105,5 +126,15 @@ export const getCategoriasRaiz = async () => {
     return response.data;
   } catch (error: any) {
     throw new Error(error.message);
+  }
+}
+
+export const getCategoriaComProdutos = async (id: string): Promise<CategoriaDetalhe> => {
+  try {
+    const response = await axios.get(`http://127.0.0.1:3001/categorias/${id}/produtos`)
+    return response.data
+  } catch (error: any) {
+    console.log('erro:', error.response?.data)
+    throw new Error(error.message)
   }
 }
