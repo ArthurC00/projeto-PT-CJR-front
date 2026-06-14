@@ -1,37 +1,38 @@
-"use client";
-import { useState } from "react";
-import axios from "axios";
-import { useRouter } from "next/navigation";
-
 import Image from "next/image";
 import Link from "next/link";
 import Navbar from "@/components/navbar";
+import { getCategorias, getProdutos, getCategoriasRaiz } from "../services/api";
+import type { Categoria, Produto } from "../services/api";
 
-export default function FeedPage() {
+export default async function FeedPage() {
+  const categorias: Categoria[] = await getCategoriasRaiz()
+  const produtos: Produto[] = await getProdutos()
+
   return (
-    <div className="min-h-screen min-w-screen">
-      <div className=" object-cover min-w-screen min-h-95 max-h-112 bg-black justify-self-start">
+    <div className="min-h-screen min-w-screen max-h-screen overflow-x-hidden">
+      <div className="object-cover min-w-screen min-h-95 max-h-112 bg-black justify-self-start">
         <Navbar />
         <Image
-          className=" ml-300 justify-baseline bottom-0.5"
+          className="ml-300 justify-baseline bottom-0.5"
           src="/girlBox.png"
           alt="mascote com caixas"
           width={450}
           height={600}
         />
         <div className="font-sans max-h-10 max-w-12xl justify-center relative left-100 bottom-60">
-          <p className="text-white text-6xl"> do CAOS à organização,</p>
+          <p className="text-white text-6xl">do CAOS à organização,</p>
           <p className="text-white text-5xl relative left-22">
-            {" "}
-            em apenas alguns cliques{" "}
+            em apenas alguns cliques
           </p>
         </div>
       </div>
+
+      {/* barra de pesquisa */}
       <div className="justify-items-between justify-center">
         <input
           type="search"
           placeholder="procure aqui"
-          className=" relative h-10 mt-5 ml-300 bg-white  w-150 px-4 rounded-full py-2 text-gray-700 focus:outline-none"
+          className="relative h-10 mt-5 ml-300 bg-white w-150 px-4 rounded-full py-2 text-gray-700 focus:outline-none"
         />
       </div>
 
@@ -50,17 +51,14 @@ export default function FeedPage() {
             ))}
           </div>
         </div>
-      </div>
+      ) : (
+        <p>Nenhuma categoria encontrada.</p>
+      )}
+
+      {/* produtos */}
       <div>
         <h1 className="text-black text-4xl font-bold ml-40 relative top-15 tracking-wider">
           Produtos{" "}
-          <Link
-            className="text-xl text-blue-500 hover:text-blue-900"
-            href={"/melhoresAvaliados"}
-          >
-            {" "}
-            melhores avaliados{" "}
-          </Link>
         </h1>
 
         {produtos.length > 0 ? (
@@ -99,5 +97,5 @@ export default function FeedPage() {
         )}
       </div>
     </div>
-  );
+  )
 }

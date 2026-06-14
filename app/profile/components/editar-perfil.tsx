@@ -2,7 +2,6 @@ import Modal from "@/components/modal";
 import Image from "next/image";
 import nonProfile from "../../../public/profile/nonProfile.png";
 import { editUser } from "@/app/services/api";
-import { deleteUser } from "@/app/services/api";
 import { EditarUsuario } from "@/app/services/api";
 import { useState } from "react";
 import AlterarSenha from "./alterar-senha";
@@ -35,19 +34,6 @@ export default function EditarPerfil({
   const handleCloseAll = () => {
     setOpenAlterarSenha(false); // fecha o alterar senha
     onClose(); // fecha o próprio editar perfil
-  };
-
-  const handleDelete = async () => {
-    // e.preventDefault();
-    // motrar um alerta de confirmação
-    const usuarioConfirma = confirm(
-      "Tem certeza de que deseja excluir sua conta? Esta ação é irreversível.",
-    );
-
-    if (usuarioConfirma) {
-      await deleteUser(userData?.id);
-    }
-    window.location.reload();
   };
 
   return (
@@ -112,10 +98,7 @@ export default function EditarPerfil({
           />
         </form>
         <div className="flex flex-col items-center justify-center w-full h-1/3 p-2">
-          <button
-            onClick={handleDelete}
-            className="rounded-full my-1 h-10 w-3/4 outline-2 outline-[#AF052A] text-[#AF052A] shadow-md hover:scale-102 transition"
-          >
+          <button className="rounded-full my-1 h-10 w-3/4 outline-2 outline-[#AF052A] text-[#AF052A] shadow-md hover:scale-102 transition">
             Deletar Conta
           </button>
           <button
