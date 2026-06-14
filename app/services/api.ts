@@ -58,14 +58,13 @@ export const editUser = async (userId: number, body: EditarUsuario) => {
   }
 }
 
-export const updatePassword = async (userId: number, {oldPassword, newPassword}: any) => {
+export const updatePassword = async (userId: number, {senha_atual, nova_senha}: any) => {
   try {
     const token = localStorage.getItem("token");
 
     const response = await api.patch(`/usuarios/${userId}/password`,
       {
-        senha_atual: oldPassword,
-        nova_senha: newPassword
+        senha_atual, nova_senha
       }, {
         headers: {
           Authorization: `Bearer ${token}`
@@ -76,7 +75,7 @@ export const updatePassword = async (userId: number, {oldPassword, newPassword}:
     return response.data;
   
   } catch(e: any) {
-    alert("Erro ao alterar a senha:" + e.response?.data?.message);
+    throw e;
   }
 }
 
