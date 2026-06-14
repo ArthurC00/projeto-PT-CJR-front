@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { getOneUser } from "../services/usersApi";
 import { decodeUserToken } from "../utils/auth";
+import ProductStars from "@/components/productStart";
 import { ModalCriarLoja } from "@/components/ModalCriarLoja";
 import { ModalEditarLoja } from "@/components/modalEditarLoja";
 import { api } from "../services/api";
@@ -69,38 +70,6 @@ export default function ProfilePage({ userId }: ProfilePageProps) {
     }
   }, [userId]);
 
-  const productStars = (rating: number) => {
-    const validRating = Math.min(Math.max(rating, 0), 5);
-    return (
-      <div className="flex items-center gap-1 text-[#FFEB3A]">
-        {Array.from({ length: 5 }).map((_, index) => {
-          const starValue = Math.min(Math.max(validRating - index, 0), 1);
-          const scaleSize = starValue > 0 ? Math.max(starValue, 0.5) : 0;
-
-          return (
-            <div
-              key={index}
-              className="w-5 h-5 flex items-center justify-center"
-            >
-              <div
-                className="flex items-center justify-center transition-transform duration-200"
-                style={{ transform: `scale(${scaleSize})` }}
-              >
-                <Star
-                  size={20}
-                  fill={
-                    starValue === 1 ? "#FFEB3A" : "oklch(87.2% 0.01 258.338)"
-                  }
-                  stroke="#000000"
-                  strokeWidth={0.5}
-                />
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    );
-  };
   const products: Product[] = [
     { name: "Bronzer", price: "R$254,99", available: true },
     { name: "Blush", price: "R$199,99", available: false },
@@ -212,7 +181,7 @@ export default function ProfilePage({ userId }: ProfilePageProps) {
                 </button>
               )}
             </h2>
-            <div className="flex gap-8 p-2 overflow-x-auto scroll-smooth [&::-webkit-scrollbar]:h-0.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-black [&::-webkit-scrollbar-thumb]:rounded-full [scrollbar-width:thin] [scrollbar-color:black_transparent]">
+            <div className="flex gap-8 p-2 overflow-x-auto scroll-smooth [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:display-none [&::-webkit-scrollbar]:hidden">
               {products.map((product, index) => (
                 <div
                   key={index}
@@ -302,7 +271,7 @@ export default function ProfilePage({ userId }: ProfilePageProps) {
                     Selena Gomez
                   </h4>
                   <div className="flex bg-slate-50 p-2 rounded-md gap-1 text-[#FFEB3A] items-center">
-                    {productStars(3.8)}
+                    <ProductStars rating={3} />
                   </div>
                 </div>
                 <p className="text-[24px] font-extralight text-black text-justify mt-4 leading-normal">

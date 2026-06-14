@@ -155,43 +155,22 @@ export const editUser = async (userId: number, body: EditarUsuario) => {
 };
 
 export const updatePassword = async (
-  userId: number,
+  id: number,
   { oldPassword, newPassword }: any,
 ) => {
-  try {
-    const token = localStorage.getItem("token");
-
-    const response = await api.patch(
-      `/usuarios/${userId}/password`,
-      {
-        senha_atual: oldPassword,
-        nova_senha: newPassword,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      },
-    );
-    alert("Alterações salvas.");
-    return response.data;
-  } catch (e: any) {
-    alert("Erro ao alterar a senha:" + e.response?.data?.message);
-  }
+  // parei aqui pq não sabia se isso ainda era da minha task ou se era da integração do perfil
 };
 
-export const deleteUser = async (userId: number) => {
+export const getCategoriaComProdutos = async (
+  id: string,
+): Promise<CategoriaDetalhe> => {
   try {
-    const token = localStorage.getItem("token");
-
-    const response = await api.delete(`/usuarios/${userId}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    alert("Conta deletada.");
+    const response = await axios.get(
+      `http://127.0.0.1:3001/categorias/${id}/produtos`,
+    );
     return response.data;
-  } catch (e: any) {
-    throw new Error(e.response?.data?.message || e.message);
+  } catch (error: any) {
+    console.log("erro:", error.response?.data);
+    throw new Error(error.message);
   }
 };
