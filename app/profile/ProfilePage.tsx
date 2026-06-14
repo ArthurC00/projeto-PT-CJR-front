@@ -10,8 +10,11 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { getOneUser } from "../services/usersApi";
 import { decodeUserToken } from "../utils/auth";
-import EditarPerfil from "./components/editar-perfil";
 import ProductStars from "@/components/productStart";
+import { ModalCriarLoja } from "@/components/ModalCriarLoja";
+import { ModalEditarLoja } from "@/components/modalEditarLoja";
+import { api } from "../services/api";
+import EditarPerfil from "./components/editar-perfil";
 import AdicionarProduto from "./components/add-product";
 
 interface Product {
@@ -24,6 +27,16 @@ interface ProfilePageProps {
   userId: number;
 }
 
+interface Loja {
+  id: number;
+  nome: string;
+  descricao: string;
+  logo_url?: string;
+  banner_url?: string;
+  sticker_url?: string;
+  categoria_loja_id?: number;
+}
+
 export default function ProfilePage({ userId }: ProfilePageProps) {
   const [editProfileButton, setEditProfileButton] = useState(false);
   const [openEditarPerfil, setOpenEditarPerfil] = useState(false);
@@ -32,6 +45,7 @@ export default function ProfilePage({ userId }: ProfilePageProps) {
   const [myId, setMyId] = useState<number>(0);
   const [error, setError] = useState(false);
   const router = useRouter();
+  const [minhaLoja, setMinhaLoja] = useState<Loja | null>(null);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -67,6 +81,20 @@ export default function ProfilePage({ userId }: ProfilePageProps) {
   ];
 
   const isOwner = myId === userId;
+
+  useEffect(() => {
+    const buscarLoja = async () => {
+      try {
+        const response = await api.get(`/lojas?usuario_id=${userId}`);
+        setMinhaLoja(response.data[0] ?? null);
+      } catch {
+        setMinhaLoja(null);
+      }
+    };
+    if (userId) {
+      buscarLoja();
+    }
+  }, [userId]);
 
   useEffect(() => {
     setEditProfileButton(isOwner);
@@ -129,7 +157,7 @@ export default function ProfilePage({ userId }: ProfilePageProps) {
             </h3>
           </div>
           {editProfileButton && (
-            <div className="mt-10 md:ml-auto md:self-center">
+            <div className="mt-10 md:ml-auto md:self-center grid-cols-2 gap-3">
               <button
                 className="w-[324px] h-[43.32px] bg-purple-600 text-white rounded-full font-medium hover:scale-102 transition"
                 onClick={handleEditarPerfil}
@@ -195,18 +223,19 @@ export default function ProfilePage({ userId }: ProfilePageProps) {
           <section>
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-[36px] font-medium text-black">Lojas</h2>
-              {editProfileButton ? (
-                <button
-                  className="w-[38.27px] h-[38.27px] bg-purple-600 text-white rounded-full flex items-center justify-center hover:scale-102 transition"
-                  onClick={() => console.log("+")}
-                >
-                  <Plus />
-                </button>
-              ) : (
-                <button className="text-[16px] font-medium text-[#6A38F3] hover:underline">
-                  ver mais
-                </button>
-              )}
+              <div className="flex flex-cols-2 mr-230">
+                {minhaLoja ? (
+                  <ModalEditarLoja
+                    loja={minhaLoja}
+                    onSuccess={() => router.refresh()}
+                  />
+                ) : (
+                  <ModalCriarLoja
+                    usuario_id={userId}
+                    onSuccess={() => router.refresh()}
+                  />
+                )}
+              </div>
             </div>
             <div className="w-full max-w-[606px] h-[186px] bg-white rounded-[23px] p-8 flex justify-between items-center shadow-sm">
               <div>
@@ -269,13 +298,6 @@ export default function ProfilePage({ userId }: ProfilePageProps) {
         ) : null
         // alterei essa função para garantir que o modal não feche assim que a página carregar, apenas quando clicar em fechar
       }
-      {openAddProductModal ? (
-        <AdicionarProduto
-          onClose={() => setOpenAddProductModal(false)}
-          height="85vh"
-          width="35vw"
-        />
-      ) : null}
     </div>
   );
 }
