@@ -13,7 +13,8 @@ import { decodeUserToken } from "../utils/auth";
 import ProductStars from "@/components/productStart";
 import { ModalCriarLoja } from "@/components/ModalCriarLoja";
 import { ModalEditarLoja } from "@/components/modalEditarLoja";
-import { api } from "../services/api"
+import { api } from "../services/api";
+import EditarPerfil from "./components/editar-perfil";
 
 interface Product {
   name: string;
@@ -26,22 +27,23 @@ interface ProfilePageProps {
 }
 
 interface Loja {
-  id: number
-  nome: string
-  descricao: string
-  logo_url?: string
-  banner_url?: string
-  sticker_url?: string
-  categoria_loja_id?: number
+  id: number;
+  nome: string;
+  descricao: string;
+  logo_url?: string;
+  banner_url?: string;
+  sticker_url?: string;
+  categoria_loja_id?: number;
 }
 
 export default function ProfilePage({ userId }: ProfilePageProps) {
   const [editProfileButton, setEditProfileButton] = useState(false);
+  const [openEditarPerfil, setOpenEditarPerfil] = useState(false);
   const [userData, setUserData] = useState<UserDataProps>();
   const [myId, setMyId] = useState<number>(0);
   const [error, setError] = useState(false);
   const router = useRouter();
-  const [minhaLoja, setMinhaLoja] = useState<Loja | null>(null)
+  const [minhaLoja, setMinhaLoja] = useState<Loja | null>(null);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -82,20 +84,24 @@ export default function ProfilePage({ userId }: ProfilePageProps) {
   useEffect(() => {
     const buscarLoja = async () => {
       try {
-        const response = await api.get(`/lojas?usuario_id=${userId}`)
-        setMinhaLoja(response.data[0] ?? null)
+        const response = await api.get(`/lojas?usuario_id=${userId}`);
+        setMinhaLoja(response.data[0] ?? null);
       } catch {
-        setMinhaLoja(null)
+        setMinhaLoja(null);
       }
-    }
+    };
     if (userId) {
-      buscarLoja()
+      buscarLoja();
     }
-  }, [userId])
+  }, [userId]);
 
   useEffect(() => {
     setEditProfileButton(isOwner);
   }, [isOwner]);
+
+  const handleEditarPerfil = () => {
+    setOpenEditarPerfil(!openEditarPerfil);
+  };
 
   if (error) {
     return (
@@ -107,8 +113,9 @@ export default function ProfilePage({ userId }: ProfilePageProps) {
       </div>
     );
   }
+
   return (
-    <div className="min-h-screen bg-[#F6F3E4] text-black overflow-y-auto pb-20">
+    <div className="z-0 min-h-screen bg-[#F6F3E4] text-black overflow-y-auto pb-20">
       <Navbar />
       <div className="bg-black h-[357px] w-full relative"></div>
 
@@ -148,7 +155,7 @@ export default function ProfilePage({ userId }: ProfilePageProps) {
             <div className="mt-10 md:ml-auto md:self-center grid-cols-2 gap-3">
               <button
                 className="w-[324px] h-[43.32px] bg-purple-600 text-white rounded-full font-medium hover:scale-102 transition"
-                onClick={() => console.log("Editar Perfil")}
+                onClick={handleEditarPerfil}
               >
                 Editar Perfil
               </button>
@@ -156,7 +163,7 @@ export default function ProfilePage({ userId }: ProfilePageProps) {
           )}
         </section>
 
-        <div className="flex flex-col gap-[60px]">
+        <div className="z-10 flex flex-col gap-[60px]">
           <section>
             <h2 className="text-[36px] font-medium text-black mb-6">
               Produtos
@@ -203,13 +210,19 @@ export default function ProfilePage({ userId }: ProfilePageProps) {
           <section>
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-[36px] font-medium text-black">Lojas</h2>
-                <div className="flex flex-cols-2 mr-230">
-                  {minhaLoja ? (
-                    <ModalEditarLoja loja={minhaLoja} onSuccess={() => router.refresh()} />
-                      ) : (
-                    <ModalCriarLoja usuario_id={userId} onSuccess={() => router.refresh()} />
-                    )}
-                </div>
+              <div className="flex flex-cols-2 mr-230">
+                {minhaLoja ? (
+                  <ModalEditarLoja
+                    loja={minhaLoja}
+                    onSuccess={() => router.refresh()}
+                  />
+                ) : (
+                  <ModalCriarLoja
+                    usuario_id={userId}
+                    onSuccess={() => router.refresh()}
+                  />
+                )}
+              </div>
             </div>
             <div className="w-full max-w-[606px] h-[186px] bg-white rounded-[23px] p-8 flex justify-between items-center shadow-sm">
               <div>
@@ -261,6 +274,17 @@ export default function ProfilePage({ userId }: ProfilePageProps) {
           </section>
         </div>
       </div>
+      {
+        openEditarPerfil ? (
+          <EditarPerfil
+            onClose={() => setOpenEditarPerfil(false)}
+            userData={userData}
+            height="85vh"
+            width="35vw"
+          />
+        ) : null
+        // alterei essa função para garantir que o modal não feche assim que a página carregar, apenas quando clicar em fechar
+      }
     </div>
   );
 }

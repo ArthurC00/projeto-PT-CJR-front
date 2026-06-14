@@ -1,8 +1,7 @@
 "use client";
 
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { useState } from "react";
-import axios from "axios";
 import { useRouter } from "next/navigation";
 import { CgProfile } from "react-icons/cg";
 import { IoMdExit } from "react-icons/io";
@@ -43,13 +42,15 @@ export default function Navbar() {
     <nav className="flex justify-between min-h-15 min-w-screen bg-black justify-items-center ">
       <h1>
         <Link href="/feed">
-        <Image
-          className="mt-4 ml-4"
-          src="/logobranca.png"
-          alt="logo"
-          width={150}
-          height={100}
-        />
+          <Image
+            className="relative top-4 left-14 h-9 w-auto object-contain"
+            src="/logobranca.png"
+            alt="logo"
+            // width={150}
+            // height={100}
+            width={221}
+            height={43}
+          />
         </Link>
       </h1>
       <div className="justify-items-right bg-black grid grid-cols-2 gap-1 mr-7 mt-3">
@@ -64,14 +65,16 @@ export default function Navbar() {
   ) : (
     <nav className="flex justify-between min-h-15 min-w-screen bg-black justify-items-center ">
       <h1>
-        <Link href = "/feed">
-        <Image
-          className="relative top-3 left-4"
-          src="/logobranca.png"
-          alt="logo"
-          width={150}
-          height={100}
-        />
+        <Link href="/feed">
+          <Image
+            className="relative top-4 left-14 h-9 w-auto object-contain"
+            src="/logobranca.png"
+            alt="logo"
+            // width={150}
+            // height={100}
+            width={221}
+            height={43}
+          />
         </Link>
       </h1>
       <div className="justify-items-right ">

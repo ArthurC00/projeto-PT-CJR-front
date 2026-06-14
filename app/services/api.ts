@@ -21,7 +21,7 @@ interface produtos {
   id: number;
   nome: string;
   preço: number;
-  categoria: categorias
+  categoria: categorias;
 }
 
 interface categorias {
@@ -29,18 +29,17 @@ interface categorias {
   nome: string;
 }
 
-
 export interface Produto {
   id: number;
   nome: string;
   preco: number;
   categoria_id: number;
   categoria: {
-  select: {
-    id: number,
-    nome: string,
-      }
-    },
+    select: {
+      id: number;
+      nome: string;
+    };
+  };
   imagens: {
     url_imagem: string;
     ordem: number;
@@ -72,8 +71,19 @@ export interface CategoriaDetalhe {
   }[];
 }
 
+export interface EditarUsuario {
+  nome: string;
+  username: string;
+  email: string;
+  foto_perfil_url: string;
+}
 
-
+export interface EditarUsuario {
+  nome: string;
+  username: string;
+  email: string;
+  foto_perfil_url: string;
+}
 
 export const postLogin = async (body: Login) => {
   try {
@@ -104,37 +114,63 @@ export const getOneProduct = async (id: string) => {
 
 export const getProdutos = async () => {
   try {
-    const response = await api.get('/produto');
+    const response = await api.get("/produto");
     return response.data;
-  } catch ( e: any ) {
+  } catch (e: any) {
     throw new Error(e.message);
   }
-}
+};
 
 export const getCategorias = async () => {
   try {
-    const response = await api.get('/categorias');
+    const response = await api.get("/categorias");
     return response.data;
-  } catch ( e: any ) {
+  } catch (e: any) {
     throw new Error(e.message);
   }
-}
+};
 
 export const getCategoriasRaiz = async () => {
   try {
-    const response = await api.get('/categorias/raiz');
+    const response = await api.get("/categorias/raiz");
     return response.data;
   } catch (error: any) {
     throw new Error(error.message);
   }
-}
-
-export const getCategoriaComProdutos = async (id: string): Promise<CategoriaDetalhe> => {
+};
+export const editUser = async (userId: number, body: EditarUsuario) => {
   try {
-    const response = await axios.get(`http://127.0.0.1:3001/categorias/${id}/produtos`)
-    return response.data
-  } catch (error: any) {
-    console.log('erro:', error.response?.data)
-    throw new Error(error.message)
+    const token = localStorage.getItem("token");
+
+    const response = await api.patch(`/usuarios/${userId}`, body, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    alert("Alterações salvas");
+    return response.data;
+  } catch (e: any) {
+    throw new Error(e.response?.data?.message || e.message);
   }
-}
+};
+
+export const updatePassword = async (
+  id: number,
+  { oldPassword, newPassword }: any,
+) => {
+  // parei aqui pq não sabia se isso ainda era da minha task ou se era da integração do perfil
+};
+
+export const getCategoriaComProdutos = async (
+  id: string,
+): Promise<CategoriaDetalhe> => {
+  try {
+    const response = await axios.get(
+      `http://127.0.0.1:3001/categorias/${id}/produtos`,
+    );
+    return response.data;
+  } catch (error: any) {
+    console.log("erro:", error.response?.data);
+    throw new Error(error.message);
+  }
+};
