@@ -155,22 +155,43 @@ export const editUser = async (userId: number, body: EditarUsuario) => {
 };
 
 export const updatePassword = async (
-  id: number,
+  userId: number,
   { oldPassword, newPassword }: any,
 ) => {
-  // parei aqui pq não sabia se isso ainda era da minha task ou se era da integração do perfil
+  try {
+    const token = localStorage.getItem("token");
+
+    const response = await api.patch(
+      `/usuarios/${userId}/password`,
+      {
+        senha_atual: oldPassword,
+        nova_senha: newPassword,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+    alert("Alterações salvas.");
+    return response.data;
+  } catch (e: any) {
+    alert("Erro ao alterar a senha:" + e.response?.data?.message);
+  }
 };
 
-export const getCategoriaComProdutos = async (
-  id: string,
-): Promise<CategoriaDetalhe> => {
+export const deleteUser = async (userId: number) => {
   try {
-    const response = await axios.get(
-      `http://127.0.0.1:3001/categorias/${id}/produtos`,
-    );
+    const token = localStorage.getItem("token");
+
+    const response = await api.delete(`/usuarios/${userId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    alert("Conta deletada.");
     return response.data;
-  } catch (error: any) {
-    console.log("erro:", error.response?.data);
-    throw new Error(error.message);
+  } catch (e: any) {
+    throw new Error(e.response?.data?.message || e.message);
   }
 };

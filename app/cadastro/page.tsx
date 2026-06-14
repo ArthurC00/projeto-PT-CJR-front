@@ -4,10 +4,7 @@ import Image from "next/image";
 import { postCadastro } from "../services/api";
 import Link from "next/link";
 
-
-
 export default function RegisterPage() {
-
   const [formData, setFormData] = useState({
     nomeCompleto: "",
     username: "",
@@ -68,7 +65,7 @@ export default function RegisterPage() {
               onChange={handleChange}
               placeholder="Nome Completo"
               required
-              className="bg-[#FFFFFF] text-black rounded-full h-12 w-full pl-8 focus:outline-none focus:ring-2 focus:ring-[#6A38F3]"
+              className="w-full py-3 px-6 rounded-full bg-[#F5F1DA] text-gray-700 outline-none focus:ring-2 focus:ring-indigo-500"
             />
             <input
               name="username"
@@ -76,7 +73,7 @@ export default function RegisterPage() {
               onChange={handleChange}
               placeholder="Username"
               required
-              className="bg-[#FFFFFF] text-black rounded-full h-12 w-full pl-8 focus:outline-none focus:ring-2 focus:ring-[#6A38F3]"
+              className="w-full py-3 px-6 rounded-full bg-[#F5F1DA] text-gray-700 outline-none focus:ring-2 focus:ring-indigo-500"
             />
             <input
               name="email"
@@ -85,7 +82,7 @@ export default function RegisterPage() {
               onChange={handleChange}
               placeholder="Email"
               required
-              className="bg-[#FFFFFF] text-black rounded-full h-12 w-full pl-8 focus:outline-none focus:ring-2 focus:ring-[#6A38F3]"
+              className="w-full py-3 px-6 rounded-full bg-[#F5F1DA] text-gray-700 outline-none focus:ring-2 focus:ring-indigo-500"
             />
             <input
               name="senha"
@@ -94,7 +91,7 @@ export default function RegisterPage() {
               onChange={handleChange}
               placeholder="Senha"
               required
-              className="bg-[#FFFFFF] text-black rounded-full h-12 w-full pl-8 focus:outline-none focus:ring-2 focus:ring-[#6A38F3]"
+              className="w-full py-3 px-6 rounded-full bg-[#F5F1DA] text-gray-700 outline-none focus:ring-2 focus:ring-indigo-500"
             />
             <input
               name="confirmarSenha"
@@ -103,7 +100,7 @@ export default function RegisterPage() {
               onChange={handleChange}
               placeholder="Confirmar Senha"
               required
-              className="bg-[#FFFFFF] text-black rounded-full h-12 w-full pl-8 focus:outline-none focus:ring-2 focus:ring-[#6A38F3]"
+              className="w-full py-3 px-6 rounded-full bg-[#F5F1DA] text-gray-700 outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>
 
@@ -117,7 +114,7 @@ export default function RegisterPage() {
           <p className="text-start md:text-start text-white md:text-lg pt-2 font-extralight">
             Já possui uma conta?{" "}
             <Link
-              className="text-[#6A38F3] font-medium hover:underline"
+              className="text-indigo-400 cursor-pointer hover:underline"
               href={"/login"}
             >
               Login
