@@ -15,6 +15,7 @@ import { ModalCriarLoja } from "@/components/ModalCriarLoja";
 import { ModalEditarLoja } from "@/components/modalEditarLoja";
 import { api } from "../services/api";
 import EditarPerfil from "./components/editar-perfil";
+import AdicionarProduto from "./components/add-product";
 
 interface Product {
   name: string;
@@ -39,6 +40,7 @@ interface Loja {
 export default function ProfilePage({ userId }: ProfilePageProps) {
   const [editProfileButton, setEditProfileButton] = useState(false);
   const [openEditarPerfil, setOpenEditarPerfil] = useState(false);
+  const [openAddProductModal, setOpenAddProductModal] = useState(false);
   const [userData, setUserData] = useState<UserDataProps>();
   const [myId, setMyId] = useState<number>(0);
   const [error, setError] = useState(false);
@@ -68,7 +70,6 @@ export default function ProfilePage({ userId }: ProfilePageProps) {
     }
   }, [userId]);
 
-  // Dados dos produtos copiados Figma
   const products: Product[] = [
     { name: "Bronzer", price: "R$254,99", available: true },
     { name: "Blush", price: "R$199,99", available: false },
@@ -101,6 +102,10 @@ export default function ProfilePage({ userId }: ProfilePageProps) {
 
   const handleEditarPerfil = () => {
     setOpenEditarPerfil(!openEditarPerfil);
+  };
+
+  const handleAddProduct = () => {
+    setOpenAddProductModal(!openAddProductModal);
   };
 
   if (error) {
@@ -165,8 +170,16 @@ export default function ProfilePage({ userId }: ProfilePageProps) {
 
         <div className="z-10 flex flex-col gap-[60px]">
           <section>
-            <h2 className="text-[36px] font-medium text-black mb-6">
+            <h2 className="flex items-center justify-between text-[36px] font-medium text-black mb-6">
               Produtos
+              {isOwner && (
+                <button
+                  className="w-[38.27px] h-[38.27px] bg-purple-600 text-white rounded-full flex items-center justify-center hover:scale-102 transition"
+                  onClick={() => handleAddProduct()}
+                >
+                  <Plus />
+                </button>
+              )}
             </h2>
             <div className="flex gap-8 p-2 overflow-x-auto scroll-smooth [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:display-none [&::-webkit-scrollbar]:hidden">
               {products.map((product, index) => (
