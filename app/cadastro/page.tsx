@@ -32,7 +32,6 @@ export default function RegisterPage() {
 
       console.log("Sucesso:", response.data);
 
-      // Limpar o formulário após o sucesso (opcional)
       setFormData({
         nomeCompleto: "",
         username: "",
@@ -112,7 +111,7 @@ export default function RegisterPage() {
             CADASTRAR
           </button>
 
-          <p className="w-full text-gray-400 mt-5 text-sm text-left">
+          <p className="text-start md:text-start text-white md:text-lg pt-2 font-extralight">
             Já possui uma conta?{" "}
             <Link
               className="text-indigo-400 cursor-pointer hover:underline"
