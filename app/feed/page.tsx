@@ -5,8 +5,8 @@ import { getCategorias, getProdutos, getCategoriasRaiz } from "../services/api";
 import type { Categoria, Produto } from "../services/api";
 
 export default async function FeedPage() {
-  const categorias: Categoria[] = await getCategoriasRaiz()
-  const produtos: Produto[] = await getProdutos()
+  const categorias: Categoria[] = await getCategoriasRaiz();
+  const produtos: Produto[] = await getProdutos();
 
   return (
     <div className="min-h-screen min-w-screen max-h-screen overflow-x-hidden">
@@ -44,8 +44,11 @@ export default async function FeedPage() {
           </h1>
           <div className="flex gap-4 overflow-auto mt-22 ml-30">
             {categorias.map((categoria: Categoria) => (
-              <a key={categoria.id} href={`/feed/categorias/${categoria.id}`}
-                  className="px-5 py-2 rounded-full bg-white text-blue-600 text-2xl hover:bg-gray-300">
+              <a
+                key={categoria.id}
+                href={`/feed/categorias/${categoria.id}`}
+                className="px-5 py-2 rounded-full bg-white text-blue-600 text-2xl hover:bg-gray-300"
+              >
                 {categoria.nome}
               </a>
             ))}
@@ -64,7 +67,7 @@ export default async function FeedPage() {
         {produtos.length > 0 ? (
           <div className="grid grid-cols-5 gap-2 mt-20 ml-20">
             {produtos.map((produto: Produto) => (
-              <Link key={produto.id} href={`/produto/${produto.id}`}> 
+              <Link key={produto.id} href={`/produto/${produto.id}`}>
                 <div className="flex flex-col rounded-4xl object-cover bg-gray-100 w-70 h-90 justify-center items-center">
                   {produto.imagens && produto.imagens.length > 0 ? (
                     <div className="">
@@ -80,11 +83,13 @@ export default async function FeedPage() {
                     </div>
                   )}
                   <div className="mt-5">
-                    <p className="flex text-3xl text-black justify-center ">{produto.nome}</p>
+                    <p className="flex text-3xl text-black justify-center ">
+                      {produto.nome}
+                    </p>
                     <p className="flex text-blue-600 text-4xl font-bold justify-center">
-                      {Number(produto.preco).toLocaleString('pt-BR', {
-                        style: 'currency',
-                        currency: 'BRL'
+                      {Number(produto.preco).toLocaleString("pt-BR", {
+                        style: "currency",
+                        currency: "BRL",
                       })}
                     </p>
                   </div>
@@ -97,5 +102,5 @@ export default async function FeedPage() {
         )}
       </div>
     </div>
-  )
+  );
 }
