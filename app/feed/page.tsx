@@ -35,83 +35,20 @@ export default function FeedPage() {
         />
       </div>
 
-      <div className="justify-items-center justify-around">
-        <h1 className="text-black text-4xl font-bold ml-40 relative top-15 tracking-wider">
-          Categorias
-        </h1>
-        <div className="justify-center ml-20 mt-30 grid grid-cols-8 gap-1">
-          <a>
-            <Image
-              className="object-cover"
-              src="/categorias/Group 39.png"
-              alt="eletronicos"
-              width={120}
-              height={120}
-            />
-          </a>
-          <a>
-            <Image
-              className="object-cover"
-              src="/categorias/Group 36.png"
-              alt="mercado"
-              width={120}
-              height={120}
-            />
-          </a>
-          <a>
-            <Image
-              className="object-cover"
-              src="/categorias/Group 35.png"
-              alt="moda"
-              width={120}
-              height={120}
-            />
-          </a>
-          <a>
-            <Image
-              className="object-cover"
-              src="/categorias/Group 37.png"
-              alt="jogos"
-              width={120}
-              height={120}
-            />
-          </a>
-          <a>
-            <Image
-              className="object-cover"
-              src="/categorias/Group 33.png"
-              alt="beleza"
-              width={120}
-              height={120}
-            />
-          </a>
-          <a>
-            <Image
-              className="object-cover"
-              src="/categorias/Group 36.png"
-              alt="mercado"
-              width={120}
-              height={120}
-            />
-          </a>
-          <a>
-            <Image
-              className="object-cover"
-              src="/categorias/Group 40.png"
-              alt="brinquedos"
-              width={120}
-              height={120}
-            />
-          </a>
-          <a>
-            <Image
-              className="object-cover"
-              src="/categorias/Group 38.png"
-              alt="farmácia"
-              width={120}
-              height={120}
-            />
-          </a>
+      {/* categorias */}
+      {categorias.length > 0 ? (
+        <div className="justify-items-center justify-around">
+          <h1 className="text-black text-4xl font-bold ml-40 relative top-15 tracking-wider">
+            Categorias
+          </h1>
+          <div className="flex gap-4 overflow-auto mt-22 ml-30">
+            {categorias.map((categoria: Categoria) => (
+              <a key={categoria.id} href={`/feed/categorias/${categoria.id}`}
+                  className="px-5 py-2 rounded-full bg-white text-blue-600 text-2xl hover:bg-gray-300">
+                {categoria.nome}
+              </a>
+            ))}
+          </div>
         </div>
       </div>
       <div>
@@ -125,26 +62,41 @@ export default function FeedPage() {
             melhores avaliados{" "}
           </Link>
         </h1>
-        <div className="justify-center grid grid-cols-5 gap-2 mt-40 ml-20">
-          <a>
-            <Image
-              className="object-cover"
-              src="/placeHolder_produtos/Group 46.png"
-              alt="smartTv"
-              width={300}
-              height={600}
-            />
-          </a>
-          <a>
-            <Image
-              className="object-cover"
-              src="/placeHolder_produtos/Group 45.png"
-              alt="notebook"
-              width={300}
-              height={600}
-            />
-          </a>
-        </div>
+
+        {produtos.length > 0 ? (
+          <div className="grid grid-cols-5 gap-2 mt-20 ml-20">
+            {produtos.map((produto: Produto) => (
+              <Link key={produto.id} href={`/produto/${produto.id}`}> 
+                <div className="flex flex-col rounded-4xl object-cover bg-gray-100 w-70 h-90 justify-center items-center">
+                  {produto.imagens && produto.imagens.length > 0 ? (
+                    <div className="">
+                      <img
+                        src={produto.imagens[0].url_imagem}
+                        alt={produto.nome}
+                        className="object-contain max-w-50 max-h-50 rounded-2xl"
+                      />
+                    </div>
+                  ) : (
+                    <div className="w-50 h-50 bg-gray-100 rounded flex items-center justify-center mb-10">
+                      <p className="text-gray-400 text-sm">sem imagem</p>
+                    </div>
+                  )}
+                  <div className="mt-5">
+                    <p className="flex text-3xl text-black justify-center ">{produto.nome}</p>
+                    <p className="flex text-blue-600 text-4xl font-bold justify-center">
+                      {Number(produto.preco).toLocaleString('pt-BR', {
+                        style: 'currency',
+                        currency: 'BRL'
+                      })}
+                    </p>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        ) : (
+          <p>Nenhum produto cadastrado ainda.</p>
+        )}
       </div>
     </div>
   );
