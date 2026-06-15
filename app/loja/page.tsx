@@ -156,9 +156,10 @@ export default function Tela_loja(){
                             href={{
                                 pathname: '/com_aval',
                                 query: {
-                                name: rev.userName,
-                                text: rev.comment || "Os produtos são simplesmente perfeitos...", // Use o campo correto do seu objeto
-                                rating: rev.userRating
+                                    id: rev.id,
+                                    name: rev.userName,
+                                    text: rev.comment || "Os produtos são simplesmente perfeitos...", 
+                                    rating: rev.userRating
                                 }
                             }}
                             className="bg-[#F6F3E4] text-black w-full rounded-2xl block hover:opacity-90 transition-opacity cursor-pointer p-4"
