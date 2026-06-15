@@ -10,7 +10,7 @@ export default function AlterarSenha({onClose, onBack, userData, width, height }
 
     const handleSaveSenha = async (e: React.FormEvent) => {
         e.preventDefault();
-        console.log("Valores atuais:", { senhaAntiga, novaSenha }); // Debug        
+        // console.log("Valores atuais:", { senhaAntiga, novaSenha }); // Debug        
 
         if (novaSenha !== confirmarSenha) {
             alert("A nova senha e a confirmação não coincidem");
