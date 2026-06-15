@@ -166,7 +166,7 @@ export default function com_aval() {
             <main className="w-full max-w-[600px] mx-auto px-4 py-8 flex-1 flex flex-col gap-6">
                 <form onSubmit={lidarComEnvio} className="flex flex-col gap-3">
                     <label className="text-black font-semibold text-sm">
-                        Responder a este comentário:
+                        Responder esta avaliação:
                     </label>
                     <div className="flex gap-2">
                         <input
