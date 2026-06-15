@@ -22,7 +22,7 @@ export default function Tela_loja(){
         { 
             id: 1, 
             userName: "Sofia Figueiredo", 
-            userRating: 5, 
+            userRating: 4.75, 
             comment: "Os produtos são simplesmente perfeitos! A pigmentação do blush é surreal de boa, vale cada centavo.",
             createdAt: "01/06/2026" 
         }
