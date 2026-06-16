@@ -67,11 +67,6 @@ export default async function CategoriaPage({
           ))}
         </div>
 
-        <button>
-          <p className="justify-center bg-cover bg-white px-50 py-2 rounded-full text-2xl text-blue-400">
-            ordenar por
-          </p>
-        </button>
       </div>
 
       {/* produtos */}
@@ -80,7 +75,7 @@ export default async function CategoriaPage({
           <div className="justify-center grid grid-cols-5 gap-2 mt-10 ml-20">
             {categoria.todosOsProdutos.map((produto) => (
               <Link key={produto.id} href={`/produto/${produto.id}`}>
-                <div className="flex flex-col rounded-4xl bg-gray-100 w-70 h-90 justify-center items-center">
+                <div className="flex flex-col rounded-4xl bg-gray-100 w-70 h-90 justify-center items-center hover:bg-gray-200">
                   {produto.imagens && produto.imagens.length > 0 ? (
                     <div className="">
                       <img
@@ -91,8 +86,8 @@ export default async function CategoriaPage({
                     </div>
                   ) : (
                     <div>
-                      <div className="w-full h-40 bg-gray-100 rounded flex items-center justify-center">
-                        <p className="text-gray-400 text-sm mb-10">sem imagem</p>
+                      <div className="w-50 h-50 bg-gray-100 flex items-center justify-center rounded-2xl">
+                        <p className="text-gray-400 text-sm ">sem imagem</p>
                       </div>
                     </div>
                   )}
