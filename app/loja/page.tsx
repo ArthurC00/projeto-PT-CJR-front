@@ -8,6 +8,7 @@ import escuro from "../../public/telaloja_degrade.svg"
 import nome from "../../public/rareBeauty_loja.png"
 import StarRating from "@/components/StarRating";
 import Link from 'next/link'; 
+import { useRouter } from 'next/navigation';
 
 type Review = {
     id: number;
@@ -18,6 +19,7 @@ type Review = {
 }
 
 export default function Tela_loja(){
+    const router = useRouter();
     const reviewPadrao: Review[] = [
         { 
             id: 1, 
@@ -29,10 +31,13 @@ export default function Tela_loja(){
     ];
 
     const [reviews, setReviews] = useState<Review[]>([]);
-    
     const [inputName, setInputName] = useState("");
     const [inputComment, setInputComment] = useState(""); 
     const [userSelectedRating, setUserSelectedRating] = useState(5);
+
+    // ESTADOS: Autenticação e Controle do Modal e da avaliação. 
+    const [isLoggedIn, setIsLoggedIn] = useState(false); 
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     useEffect(() => {
         const comentariosSalvos = localStorage.getItem("@rareBeauty:reviews");
@@ -70,9 +75,11 @@ export default function Tela_loja(){
         const listaAtualizada = [newReview, ...reviews];
         setReviews(listaAtualizada);
         
+        // Limpa os campos e fecha o modal
         setInputName("");
         setInputComment("");
         setUserSelectedRating(5);
+        setIsModalOpen(false); 
     };
 
     const storeRating = calcularMedia(reviews);
@@ -105,48 +112,93 @@ export default function Tela_loja(){
                     <StarRating rating={storeRating} />
                 </div>
 
-                {/* formulário */}
-                <form onSubmit={handleAddReview} className="w-[600px] mt-6 p-6 border border-[#F6F3E4]/20 rounded-xl bg-neutral-900/50 flex flex-col gap-4">
-                    <h3 className="text-[#F6F3E4] text-lg font-medium">Deixe sua avaliação</h3>
-                    
-                    {/* Input do Nome */}
-                    <div className="flex flex-col gap-1">
-                        <label className="text-[#F6F3E4]/70 text-sm">Seu Nome</label>
-                        <input 
-                            type="text" 
-                            value={inputName}
-                            onChange={(e) => setInputName(e.target.value)}
-                            placeholder="Ex: Sofia Figueiredo"
-                            className="bg-black text-[#F6F3E4] border border-[#F6F3E4]/30 rounded-lg px-4 py-2 focus:outline-none focus:border-[#F6F3E4] text-sm"
-                        />
-                    </div>
-
-                    {/* Input do Comentário */}
-                    <div className="flex flex-col gap-1">
-                        <label className="text-[#F6F3E4]/70 text-sm">Seu Comentário</label>
-                        <textarea 
-                            value={inputComment}
-                            onChange={(e) => setInputComment(e.target.value)}
-                            placeholder="O que você achou da loja e dos produtos?"
-                            rows={3}
-                            className="bg-black text-[#F6F3E4] border border-[#F6F3E4]/30 rounded-lg px-4 py-2 focus:outline-none focus:border-[#F6F3E4] text-sm resize-none"
-                        />
-                    </div>
-
-                    {/* estrelas e botão */}
-                    <div className="flex items-center justify-between mt-2">
-                        <div className="flex items-center gap-3">
-                            <span className="text-[#F6F3E4]/70 text-sm">Sua Nota:</span>
-                            <StarRating rating={userSelectedRating} onRatingChange={setUserSelectedRating} />
-                        </div>
+                {/* CONDICIONAL: Mostra o Botão de Avaliar ou o Card de Login */}
+                {isLoggedIn ? (
+                    <div className="w-[600px] mt-6 flex justify-center">
                         <button 
-                            type="submit"
-                            className="bg-[#F6F3E4] text-black px-6 py-2 rounded-full font-medium hover:bg-[#F6F3E4]/80 transition-all text-sm shadow-md"
+                            onClick={() => setIsModalOpen(true)}
+                            className="bg-purple-600 text-white px-8 py-3 rounded-full font-semibold hover:bg-purple-700 transition-all text-sm shadow-lg transform hover:scale-105"
                         >
-                            Avaliar
+                            Deixar uma Avaliação
                         </button>
                     </div>
-                </form>
+                ) : (
+                    /* Se não estiver autenticado, exibe o incentivo ao login */
+                    <div className="w-[600px] mt-6 p-8 border border-dashed border-purple-500/30 rounded-xl bg-neutral-900/30 flex flex-col items-center justify-center gap-4 text-center">
+                        <p className="text-[#F6F3E4]/80 text-base">
+                            Gostou do produto? Faça login com a sua conta para deixar uma avaliação.
+                        </p>
+                        <button 
+                            onClick={() => router.push('/login')} 
+                            className="bg-purple-600 text-white px-8 py-3 rounded-full font-semibold hover:bg-purple-700 transition-all text-sm shadow-lg transform hover:scale-105"
+                        >
+                            Fazer Login para Avaliar
+                        </button>
+                    </div>
+                )}
+
+                {isModalOpen && (
+                    <div 
+                        className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm"
+                        onClick={() => setIsModalOpen(false)} 
+                    >
+                        {/* Conteúdo do Modal */}
+                        <form 
+                            onSubmit={handleAddReview} 
+                            onClick={(e) => e.stopPropagation()} // Impede o fechamento ao clicar dentro do formulário
+                            className="w-[600px] p-6 border border-purple-500/20 rounded-xl bg-neutral-900 flex flex-col gap-4 relative shadow-2xl animate-fade-in"
+                        >
+                            {/* "X" */}
+                            <button 
+                                type="button"
+                                onClick={() => setIsModalOpen(false)}
+                                className="absolute top-4 right-4 text-[#F6F3E4]/50 hover:text-white text-lg font-bold transition-colors"
+                            >
+                                ✕
+                            </button>
+
+                            <h3 className="text-[#F6F3E4] text-xl font-medium mb-2">Deixe sua avaliação</h3>
+                            
+                            {/* Input do Nome */}
+                            <div className="flex flex-col gap-1">
+                                <label className="text-[#F6F3E4]/70 text-sm">Seu Nome</label>
+                                <input 
+                                    type="text" 
+                                    value={inputName}
+                                    onChange={(e) => setInputName(e.target.value)}
+                                    placeholder="Ex: Sofia Figueiredo"
+                                    className="bg-black text-[#F6F3E4] border border-purple-500/30 rounded-lg px-4 py-2 focus:outline-none focus:border-purple-500 text-sm"
+                                />
+                            </div>
+
+                            {/* Input do Comentário */}
+                            <div className="flex flex-col gap-1">
+                                <label className="text-[#F6F3E4]/70 text-sm">Seu Comentário</label>
+                                <textarea 
+                                    value={inputComment}
+                                    onChange={(e) => setInputComment(e.target.value)}
+                                    placeholder="O que você achou da loja e dos produtos?"
+                                    rows={4}
+                                    className="bg-black text-[#F6F3E4] border border-purple-500/30 rounded-lg px-4 py-2 focus:outline-none focus:border-purple-500 text-sm resize-none"
+                                />
+                            </div>
+
+                            {/* estrelas e botão enviar */}
+                            <div className="flex items-center justify-between mt-2">
+                                <div className="flex items-center gap-3">
+                                    <span className="text-[#F6F3E4]/70 text-sm">Sua Nota:</span>
+                                    <StarRating rating={userSelectedRating} onRatingChange={setUserSelectedRating} />
+                                </div>
+                                <button 
+                                    type="submit"
+                                    className="bg-purple-600 text-white px-6 py-2 rounded-full font-medium hover:bg-purple-700 transition-all text-sm shadow-md"
+                                >
+                                    Enviar Avaliação
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                )}
 
                 {/* lista de comentários */}
                 <div className="w-[600px] flex flex-col gap-4 mt-8">
@@ -164,25 +216,20 @@ export default function Tela_loja(){
                             }}
                             className="bg-[#F6F3E4] text-black w-full rounded-2xl block hover:opacity-90 transition-opacity cursor-pointer p-4"
                         >
-                            {/* Cabeçalho do Card */}
                             <div className="flex items-start justify-between w-full">
                                 <div className="flex items-center gap-4">
                                     <div className="w-12 h-12 bg-neutral-300 rounded-full overflow-hidden flex items-center justify-center font-bold">
                                         {rev.userName ? rev.userName.charAt(0).toUpperCase() : "U"}
                                     </div>
-                                    
                                     <div className="flex flex-col">
                                         <span className="font-semibold text-lg leading-tight">{rev.userName}</span>
                                         <span className="text-xs text-neutral-500">{rev.createdAt}</span>
                                     </div>
                                 </div>
-
                                 <div className="shrink-0">
                                     <StarRating rating={rev.userRating} />
                                 </div>
                             </div>
-
-                            {/* Corpo do Card */}
                             <div className="pl-16"> 
                                 <p className="text-neutral-700 text-sm leading-relaxed break-words">
                                     "{rev.comment}"
