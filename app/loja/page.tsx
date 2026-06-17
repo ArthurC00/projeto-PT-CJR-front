@@ -8,6 +8,7 @@ import escuro from "../../public/telaloja_degrade.svg"
 import nome from "../../public/rareBeauty_loja.png"
 import StarRating from "@/components/StarRating";
 import Link from 'next/link'; 
+import { useRouter } from 'next/navigation'; // Importado para fazer o redirecionamento
 
 type Review = {
     id: number;
@@ -18,6 +19,7 @@ type Review = {
 }
 
 export default function Tela_loja(){
+    const router = useRouter();
     const reviewPadrao: Review[] = [
         { 
             id: 1, 
@@ -34,6 +36,9 @@ export default function Tela_loja(){
     const [inputComment, setInputComment] = useState(""); 
     const [userSelectedRating, setUserSelectedRating] = useState(5);
 
+    // ESTADO DE AUTENTICAÇÃO (Altere para true para testar o formulário aparecendo)
+    const [isLoggedIn, setIsLoggedIn] = useState(true); 
+
     useEffect(() => {
         const comentariosSalvos = localStorage.getItem("@rareBeauty:reviews");
         if (comentariosSalvos) {
@@ -41,6 +46,10 @@ export default function Tela_loja(){
         } else {
             setReviews(reviewPadrao);
         }
+
+        // Exemplo de checagem: Se você salva um token ou usuário no localStorage ao logar
+        // const token = localStorage.getItem("@rareBeauty:token");
+        // if (token) setIsLoggedIn(true);
     }, []);
 
     useEffect(() => {
@@ -105,48 +114,63 @@ export default function Tela_loja(){
                     <StarRating rating={storeRating} />
                 </div>
 
-                {/* formulário */}
-                <form onSubmit={handleAddReview} className="w-[600px] mt-6 p-6 border border-[#F6F3E4]/20 rounded-xl bg-neutral-900/50 flex flex-col gap-4">
-                    <h3 className="text-[#F6F3E4] text-lg font-medium">Deixe sua avaliação</h3>
-                    
-                    {/* Input do Nome */}
-                    <div className="flex flex-col gap-1">
-                        <label className="text-[#F6F3E4]/70 text-sm">Seu Nome</label>
-                        <input 
-                            type="text" 
-                            value={inputName}
-                            onChange={(e) => setInputName(e.target.value)}
-                            placeholder="Ex: Sofia Figueiredo"
-                            className="bg-black text-[#F6F3E4] border border-[#F6F3E4]/30 rounded-lg px-4 py-2 focus:outline-none focus:border-[#F6F3E4] text-sm"
-                        />
-                    </div>
-
-                    {/* Input do Comentário */}
-                    <div className="flex flex-col gap-1">
-                        <label className="text-[#F6F3E4]/70 text-sm">Seu Comentário</label>
-                        <textarea 
-                            value={inputComment}
-                            onChange={(e) => setInputComment(e.target.value)}
-                            placeholder="O que você achou da loja e dos produtos?"
-                            rows={3}
-                            className="bg-black text-[#F6F3E4] border border-[#F6F3E4]/30 rounded-lg px-4 py-2 focus:outline-none focus:border-[#F6F3E4] text-sm resize-none"
-                        />
-                    </div>
-
-                    {/* estrelas e botão */}
-                    <div className="flex items-center justify-between mt-2">
-                        <div className="flex items-center gap-3">
-                            <span className="text-[#F6F3E4]/70 text-sm">Sua Nota:</span>
-                            <StarRating rating={userSelectedRating} onRatingChange={setUserSelectedRating} />
+                {/* CONDICIONAL DE FORMULÁRIO OU BOTÃO DE LOGIN */}
+                {isLoggedIn ? (
+                    <form onSubmit={handleAddReview} className="w-[600px] mt-6 p-6 border border-[#F6F3E4]/20 rounded-xl bg-neutral-900/50 flex flex-col gap-4">
+                        <h3 className="text-[#F6F3E4] text-lg font-medium">Deixe sua avaliação</h3>
+                        
+                        {/* Input do Nome */}
+                        <div className="flex flex-col gap-1">
+                            <label className="text-[#F6F3E4]/70 text-sm">Seu Nome</label>
+                            <input 
+                                type="text" 
+                                value={inputName}
+                                onChange={(e) => setInputName(e.target.value)}
+                                placeholder="Ex: Sofia Figueiredo"
+                                className="bg-black text-[#F6F3E4] border border-[#F6F3E4]/30 rounded-lg px-4 py-2 focus:outline-none focus:border-[#F6F3E4] text-sm"
+                            />
                         </div>
+
+                        {/* Input do Comentário */}
+                        <div className="flex flex-col gap-1">
+                            <label className="text-[#F6F3E4]/70 text-sm">Seu Comentário</label>
+                            <textarea 
+                                value={inputComment}
+                                onChange={(e) => setInputComment(e.target.value)}
+                                placeholder="O que você achou da loja e dos produtos?"
+                                rows={3}
+                                className="bg-black text-[#F6F3E4] border border-[#F6F3E4]/30 rounded-lg px-4 py-2 focus:outline-none focus:border-[#F6F3E4] text-sm resize-none"
+                            />
+                        </div>
+
+                        {/* estrelas e botão */}
+                        <div className="flex items-center justify-between mt-2">
+                            <div className="flex items-center gap-3">
+                                <span className="text-[#F6F3E4]/70 text-sm">Sua Nota:</span>
+                                <StarRating rating={userSelectedRating} onRatingChange={setUserSelectedRating} />
+                            </div>
+                            <button 
+                                type="submit"
+                                className="bg-[#F6F3E4] text-black px-6 py-2 rounded-full font-medium hover:bg-[#F6F3E4]/80 transition-all text-sm shadow-md"
+                            >
+                                Avaliar
+                            </button>
+                        </div>
+                    </form>
+                ) : (
+                    /* botão de: volte ao Login se não estiver autenticado */
+                    <div className="w-[600px] mt-6 p-8 border border-dashed border-[#F6F3E4]/20 rounded-xl bg-neutral-900/30 flex flex-col items-center justify-center gap-4 text-center">
+                        <p className="text-[#F6F3E4]/80 text-base">
+                            Gostou do produto? Faça login com a sua conta para deixar uma avaliação.
+                        </p>
                         <button 
-                            type="submit"
-                            className="bg-[#F6F3E4] text-black px-6 py-2 rounded-full font-medium hover:bg-[#F6F3E4]/80 transition-all text-sm shadow-md"
+                            onClick={() => router.push('/login')} // Altere '/login' para a sua rota real de login
+                            className="bg-[#F6F3E4] text-amber-100 px-8 py-3 rounded-full font-semibold bg-purple-600 transition-all text-sm shadow-lg transform hover:scale-105"
                         >
-                            Avaliar
+                            Fazer Login para Avaliar
                         </button>
                     </div>
-                </form>
+                )}
 
                 {/* lista de comentários */}
                 <div className="w-[600px] flex flex-col gap-4 mt-8">
