@@ -2,22 +2,18 @@ import Modal from "@/components/modal";
 import Image from "next/image";
 import { updatePassword } from "@/app/services/api";
 import { useState } from "react";
-import { Eye, EyeOff } from "lucide-react"; 
 
 export default function AlterarSenha({onClose, onBack, userData, width, height }:any){
-    const [mostrarSenhaAntiga, setMostrarSenhaAntiga] = useState(false)
-    const [mostrarNovaSenha, setMostrarNovaSenha] = useState(false)
-    const [mostrarConfirmarSenha, setMostrarConfirmarSenha] = useState(false)
-    
-    const handleSaveSenha = async (e: React.FormEvent<HTMLFormElement>) => {
+    const [ senhaAntiga, setSenhaAntiga ] = useState("");
+    const [ novaSenha, setNovaSenha ] = useState("");
+    const [ confirmarSenha, setConfirmarSenha ] = useState("");
+
+    const handleSaveSenha = async (e: React.FormEvent) => {
         e.preventDefault();
-        const formData = new FormData(e.currentTarget);
-        const senhaAntiga = formData.get("senha") as string;
-        const novaSenha = formData.get("nova_senha") as string;
-        const confirmarSenha = formData.get("confirmar_senha") as string;
+        // console.log("Valores atuais:", { senhaAntiga, novaSenha }); // Debug        
 
         if (novaSenha !== confirmarSenha) {
-            alert("A nova senha e a confirmação devem ser iguais");
+            alert("A nova senha e a confirmação não coincidem");
             return;
         }
 
@@ -27,10 +23,11 @@ export default function AlterarSenha({onClose, onBack, userData, width, height }
         }
 
         try {
-            await updatePassword(userData.id, {senhaAntiga, novaSenha});
-            alert("Senha alterada com sucesso");
-        } catch (error) {
-            alert("Senha antiga incorreta ou erro no servidor");
+            await updatePassword(userData.id, {senha_atual: senhaAntiga, nova_senha: novaSenha});
+            onClose();
+        } catch (error: any) {
+            // tenta mostrar a mensagem de erro do servidor e se não conseguir usa uma genérica
+            alert(error.response?.data?.message || "Ocorreu um erro ao salvar.");
         }
     }
 
@@ -62,59 +59,37 @@ export default function AlterarSenha({onClose, onBack, userData, width, height }
                 </div>
                 
                 <div className="flex flex-col h-1/3 w-full items-center justify-center">
-                    <form 
-                        id="alterar-senha" className="flex flex-col items-center justify-center w-full h-full p-2"
-                        onSubmit={handleSaveSenha}
-                    >
-                    
-                    <div className="relative flex items-center w-3/4">
-                        <input
-                            name="senha"
-                            type={mostrarSenhaAntiga ? "text" : "password"}
-                            placeholder="Senha Antiga"
-                            aria-label="Senha antiga"
-                            className="bg-white text-black rounded-full my-1 h-10 w-3/4 pl-2"
-                        />
-                        <button
-                            type="button"
-                            onClick={() => setMostrarSenhaAntiga((prev) => !prev)}
-                            className="absolute right-3 text-gray-500 hover:text-gray-700">
-                            {mostrarSenhaAntiga ? <EyeOff size={18}/> : <Eye size={18}/>}
-                        </button>
-                    </div>
-
-                    <div className="relative flex items-center w-3/4">
-                        <input
-                            name="nova_senha"
-                            type={mostrarNovaSenha ? "text" : "password"}
-                            placeholder="Nova Senha"
-                            aria-label="Nova senha"
-                            className="bg-white text-black rounded-full my-1 h-10 w-3/4 pl-2"
-                        />
-                        <button
-                            type="button"
-                            onClick={() => setMostrarNovaSenha((prev) => !prev)}
-                            className="absolute right-3 text-gray-500 hover:text-gray-700">
-                            {mostrarNovaSenha ? <EyeOff size={18}/> : <Eye size={18}/>}
-                        </button>
-                    </div>
-
-                    <div className="relative flex items-center w-3/4">
-                        <input
-                            name="confirmar_senha"
-                            type={mostrarConfirmarSenha ? "text" : "password"}
-                            placeholder="Confirmar Senha"
-                            aria-label="Confirmar senha"
-                            className="bg-white text-black rounded-full my-1 h-10 w-3/4 pl-2"
-                        />
-                        <button
-                            type="button"
-                            onClick={() => setMostrarConfirmarSenha((prev) => !prev)}
-                            className="absolute right-3 text-gray-500 hover:text-gray-700">
-                            {mostrarConfirmarSenha ? <EyeOff size={18}/> : <Eye size={18}/>}
-                        </button>
-                    </div>
-                
+                    <form id="alterar-senha" onSubmit={handleSaveSenha} className="flex flex-col items-center justify-center w-full h-full p-2">
+                    <input
+                        required
+                        value={senhaAntiga}
+                        onChange={(e) => setSenhaAntiga(e.target.value)}
+                        name="senha"
+                        type="password"
+                        placeholder="Senha Antiga"
+                        aria-label="Senha antiga"
+                        className="bg-white text-black rounded-full my-1 h-10 w-3/4 pl-2"
+                    />
+                    <input
+                        required
+                        value={novaSenha}
+                        onChange={(e) => setNovaSenha(e.target.value)}
+                        name="nova_senha"
+                        type="password"
+                        placeholder="Nova Senha"
+                        aria-label="Nova senha"
+                        className="bg-white text-black rounded-full my-1 h-10 w-3/4 pl-2"
+                    />
+                    <input
+                        required
+                        value={confirmarSenha}
+                        onChange={(e) => setConfirmarSenha(e.target.value)}
+                        name="confirmar_senha"
+                        type="password"
+                        placeholder="Confirmar Senha"
+                        aria-label="Confirmar senha"
+                        className="bg-white text-black rounded-full my-1 h-10 w-3/4 pl-2"
+                    />
                 </form>
 
                 </div>
