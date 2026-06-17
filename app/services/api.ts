@@ -156,10 +156,29 @@ export const editUser = async (userId: number, body: EditarUsuario) => {
 };
 
 export const updatePassword = async (
-  id: number,
-  { oldPassword, newPassword }: any,
+  userId: number,
+  { senha_atual, nova_senha }: any,
 ) => {
-  // parei aqui pq não sabia se isso ainda era da minha task ou se era da integração do perfil
+  try {
+    const token = localStorage.getItem("token");
+
+    const response = await api.patch(
+      `/usuarios/${userId}/password`,
+      {
+        senha_atual,
+        nova_senha,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+    alert("Alterações salvas.");
+    return response.data;
+  } catch (e: any) {
+    throw e;
+  }
 };
 
 export const getCategoriaComProdutos = async (
