@@ -46,6 +46,7 @@ export default function AlterarSenha({onClose, onBack, userData, width, height }
                     alt="Voltar"
                     />
             </button>
+            
             <div className="flex flex-col items-center justify-center w-full h-full">
                 <div className="flex flex-col h-1/3 p-4 w-full items-center justify-center">
                     <Image
@@ -56,6 +57,7 @@ export default function AlterarSenha({onClose, onBack, userData, width, height }
                         alt="Ícone de chave roxo"
                     />
                 </div>
+                
                 <div className="flex flex-col h-1/3 w-full items-center justify-center">
                     <form id="alterar-senha" onSubmit={handleSaveSenha} className="flex flex-col items-center justify-center w-full h-full p-2">
                     <input
@@ -89,6 +91,7 @@ export default function AlterarSenha({onClose, onBack, userData, width, height }
                         className="bg-white text-black rounded-full my-1 h-10 w-3/4 pl-2"
                     />
                 </form>
+
                 </div>
                 <div className="flex flex-col h-1/3 w-full items-center justify-center">
                     <button form="alterar-senha" type="submit" className="rounded-full my-1 h-10 w-3/4 outline-4 -outline-offset-2 outline-[#6A38F3] bg-[#6A38F3] text-white shadow-md hover:scale-102 transition">Salvar Senha</button>

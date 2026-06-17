@@ -3,10 +3,18 @@ import React, { useState } from "react";
 import Image from "next/image";
 import { postCadastro } from "../services/api";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Eye, EyeOff } from "lucide-react"
 
 
 
 export default function RegisterPage() {
+
+  const router = useRouter()
+  const [sucesso, setSucesso] = useState("")
+  const [erro, setErro] = useState("")
+  const [mostrarSenha, setMostrarSenha] = useState(false)
+  const [mostrarConfirmarSenha, setMostrarConfirmarSenha] = useState(false)
 
   const [formData, setFormData] = useState({
     nomeCompleto: "",
@@ -23,9 +31,16 @@ export default function RegisterPage() {
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSucesso("");
+    setErro("");
+
+    if (formData.senha !== formData.confirmarSenha) {
+      setErro("as senhas não coincidem!")
+      return
+    }
 
     try {
-      const response = await postCadastro({
+        await postCadastro({
         nome: formData.nomeCompleto,
         username: formData.username,
         email: formData.email,
@@ -33,7 +48,7 @@ export default function RegisterPage() {
         foto_perfil_url: "",
       });
 
-      console.log("Sucesso:", response.data);
+      setSucesso("cadastrado com sucesso!")
 
       setFormData({
         nomeCompleto: "",
@@ -42,10 +57,14 @@ export default function RegisterPage() {
         senha: "",
         confirmarSenha: "",
       });
+
+      setTimeout(() => {
+        router.push('/login')
+      }, 2000)
+
     } catch (error: any) {
-      const mensagemErro = error || "Erro desconhecido";
-      console.error("Detalhes do erro:", mensagemErro);
-      alert("Erro ao cadastrar: " + mensagemErro);
+      const mensagemErro = error?.response?.data?.message || "Não foi possível cadastrar."
+      setErro(Array.isArray(mensagemErro) ? mensagemErro.join(", ") : mensagemErro)
     }
   };
 
@@ -87,25 +106,56 @@ export default function RegisterPage() {
               required
               className="bg-[#FFFFFF] text-black rounded-full h-12 w-full pl-8 focus:outline-none focus:ring-2 focus:ring-[#6A38F3]"
             />
-            <input
-              name="senha"
-              type="password"
-              value={formData.senha}
-              onChange={handleChange}
-              placeholder="Senha"
-              required
-              className="bg-[#FFFFFF] text-black rounded-full h-12 w-full pl-8 focus:outline-none focus:ring-2 focus:ring-[#6A38F3]"
-            />
-            <input
-              name="confirmarSenha"
-              type="password"
-              value={formData.confirmarSenha}
-              onChange={handleChange}
-              placeholder="Confirmar Senha"
-              required
-              className="bg-[#FFFFFF] text-black rounded-full h-12 w-full pl-8 focus:outline-none focus:ring-2 focus:ring-[#6A38F3]"
-            />
+            <div className="relative w-full">
+              <input
+                required 
+                type ={mostrarSenha ? "text" : "password"}
+                name="senha"
+                value={formData.senha}
+                onChange={handleChange}
+                placeholder="Senha"
+                className="bg-[#FFFFFF] text-black rounded-full h-12 w-full pl-8 focus:outline-none focus:ring-2 focus:ring-[#6A38F3]"
+              />
+              <button
+              type="button"
+              onClick={() => setMostrarSenha((prev) => !prev)}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700">
+                {mostrarSenha ? <EyeOff size={20}/> : <Eye size={20}/>}
+              </button>
+            </div>
+            
+            <div className="relative w-full">
+              <input
+                name="confirmarSenha"
+                type= {mostrarConfirmarSenha ? "text" : "password"}
+                value={formData.confirmarSenha}
+                onChange={handleChange}
+                placeholder="Confirmar Senha"
+                required
+                className="bg-[#FFFFFF] text-black rounded-full h-12 w-full pl-8 focus:outline-none focus:ring-2 focus:ring-[#6A38F3]"
+              />
+              <button
+              type="button"
+              onClick={() => setMostrarConfirmarSenha((prev) => !prev)}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700">
+                {mostrarConfirmarSenha ? <EyeOff size={20}/> : <Eye size={20}/>}
+              </button>
+            </div>
           </div>
+
+          {/* mensagem de sucesso */}
+          {sucesso && (
+            <p className="w-full mt-4 text-green-400 text-sm text-center">
+              ✓ {sucesso} Redirecionando para o login...
+            </p>
+          )}
+
+          {/* mensagem de erro */}
+          {erro && (
+            <p className="w-full mt-4 text-red-400 text-sm text-center">
+              ✗ {erro}
+            </p>
+          )}
 
           <button
             type="submit"
