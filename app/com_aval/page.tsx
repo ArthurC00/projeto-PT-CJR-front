@@ -1,24 +1,50 @@
 "use client"
 
 import Navbar from "@/components/navbar";
-import { useState, FormEvent } from "react";
-import { useSearchParams } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import Modal from "@/components/modal";
 
+interface AvaliacaoTipo {
+    id: number;
+    texto: string;
+    estrelas: number;
+}
+
 export default function com_aval() {
     const searchParams = useSearchParams();
+    const router = useRouter();
+    
+    // infos vindas da URL
+    const reviewId = Number(searchParams.get('id'));
     const name = searchParams.get('name') || 'Usuário';
     const text = searchParams.get('text') || 'Sem comentário.';
-    const rating = searchParams.get('rating') || '0';
+    const rating = Number(searchParams.get('rating')) || 0; // Convertido para número
     
-    // 1. ESTADO PARA CONTROLAR O MODAL (Aberto/Fechado)
     const [isModalOpen, setIsModalOpen] = useState(false);
-
     const [respostas, setRespostas] = useState([
         { id: 1, autor: "Suporte Loja", texto: "Muito obrigada pelo o feedback!" }
     ]);
     const [novaResposta, setNovaResposta] = useState("");
+
+    // Estado da avaliação atual
+    const [avaliacao, setAvaliacao] = useState<AvaliacaoTipo | null>({
+        id: reviewId,
+        texto: text,
+        estrelas: rating
+    });
+
+    // Estados temporários para controlar o formulário dentro do Modal
+    const [textoTemporario, setTextoTemporario] = useState(text);
+    const [estrelasTemporarias, setEstrelasTemporarias] = useState(rating);
+    const [hoverEstrelas, setHoverEstrelas] = useState<number | null>(null); // Efeito visual de hover
+
+    // Sincroniza os estados caso os parâmetros da URL mudem
+    useEffect(() => {
+        if (text) setTextoTemporario(text);
+        if (rating) setEstrelasTemporarias(rating);
+    }, [text, rating]);
 
     const lidarComEnvio = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -34,6 +60,69 @@ export default function com_aval() {
         setNovaResposta("");
     };
 
+    // para salvar alteração no localstorage
+    const handleSalvar = async () => {
+        if (!avaliacao || !reviewId) return;
+
+        try {
+            const itensSalvos = localStorage.getItem("@rareBeauty:reviews");
+            if (itensSalvos) {
+                const listaReviews = JSON.parse(itensSalvos);
+                
+                // Mapeia alterando o texto (comment) E as estrelas (userRating)
+                const listaAtualizada = listaReviews.map((rev: any) => {
+                    if (rev.id === reviewId) {
+                        return { 
+                            ...rev, 
+                            comment: textoTemporario, 
+                            userRating: estrelasTemporarias 
+                        };
+                    }
+                    return rev;
+                });
+
+                localStorage.setItem("@rareBeauty:reviews", JSON.stringify(listaAtualizada));
+            }
+
+            // Atualiza o estado visual da tela de edição
+            setAvaliacao({ 
+                ...avaliacao, 
+                texto: textoTemporario, 
+                estrelas: estrelasTemporarias 
+            });
+            
+            alert("Avaliação atualizada com sucesso!");
+            setIsModalOpen(false);
+        } catch(error) {
+            alert("Erro ao salvar alteração.");
+        }
+    };
+
+    // deletar no localstorage
+    const handleDeletar = async () => {
+        if (!reviewId) return;
+
+        if (confirm("Tem certeza absoluta que deseja deletar sua avaliação?")){
+            try {
+                const itensSalvos = localStorage.getItem("@rareBeauty:reviews");
+                if (itensSalvos) {
+                    const listaReviews = JSON.parse(itensSalvos);
+                    const listaFiltrada = listaReviews.filter((rev: any) => rev.id !== reviewId);
+                    localStorage.setItem("@rareBeauty:reviews", JSON.stringify(listaFiltrada));
+                }
+
+                setAvaliacao(null);
+                setTextoTemporario("");
+
+                alert("Avaliação deletada.");
+                setIsModalOpen(false);
+                router.push("/loja");
+            } catch(error) {
+                alert("Erro ao deletar.");
+            }
+        }
+    };
+
     return (
         <div className="min-h-screen bg-[#F6F3E4] overflow-x-auto flex flex-col">
             <Navbar />
@@ -46,21 +135,27 @@ export default function com_aval() {
                             <h3 className="font-semibold text-lg">{name}</h3>
                             <span className="text-xs text-neutral-500">Avaliação enviada</span>
                         </div>
-                        <div className="text-amber-400 font-bold">
-                            {"★".repeat(Number(rating))}
+                        
+                        {/* Mostra as estrelas atualizadas do estado atualizado */}
+                        <div className="text-amber-400 font-bold text-lg">
+                            {"★".repeat(avaliacao ? avaliacao.estrelas : 0)}
                         </div>
                     </div>
-                    <p className="italic text-gray-800">"{text}"</p>
+                    
+                    <p className="italic text-gray-800">
+                        {avaliacao ? `"${avaliacao.texto}"` : "Esta avaliação foi deletada."}
+                    </p>
 
-                    {/* botão para abrir o modal */}
-                    <div className="mt-4 flex justify-end">
-                        <button 
-                            onClick={() => setIsModalOpen(true)}
-                            className="text-xs bg-black text-white px-3 py-1.5 rounded-lg font-medium hover:bg-neutral-800 transition-colors"
-                        >
-                            Quero editar minha avaliação
-                        </button>
-                    </div>
+                    {avaliacao && (
+                        <div className="mt-4 flex justify-end">
+                            <button 
+                                onClick={() => setIsModalOpen(true)}
+                                className="text-xs bg-black text-white px-3 py-1.5 rounded-lg font-medium hover:bg-neutral-800 transition-colors"
+                            >
+                                Quero editar minha avaliação
+                            </button>
+                        </div>
+                    )}
                 </div>
 
                 <Link href="/loja" className="mt-6 text-sm text-gray-400 hover:underline">
@@ -69,10 +164,9 @@ export default function com_aval() {
             </div>
 
             <main className="w-full max-w-[600px] mx-auto px-4 py-8 flex-1 flex flex-col gap-6">
-
                 <form onSubmit={lidarComEnvio} className="flex flex-col gap-3">
                     <label className="text-black font-semibold text-sm">
-                        Responder a este comentário:
+                        Responder esta avaliação:
                     </label>
                     <div className="flex gap-2">
                         <input
@@ -93,7 +187,6 @@ export default function com_aval() {
 
                 <hr className="border-neutral-300 my-2" />
 
-                {/* Lista de Respostas na parte bege */}
                 <div className="flex flex-col gap-4">
                     <h2 className="text-lg font-bold text-black">
                         Respostas ({respostas.length})
@@ -116,79 +209,67 @@ export default function com_aval() {
                         </div>
                     ))}
                 </div>
-
             </main>
 
             {/* modal */}
             {isModalOpen && (
                 <Modal 
-                  onClose={() => setIsModalOpen(false)}
-                  width="max-w-md"
-                  height="auto"
-                >
-                  <div className="relative p-6 bg-[#F0F0F0] text-black font-sans rounded-2xl">
-                    <button 
-                      onClick={() => setIsModalOpen(false)}
-                      className="absolute top-4 right-4 text-2xl font-light hover:opacity-70 transition-opacity"
-                      >
-                        &times;
-                        </button>
+                    onClose={() => setIsModalOpen(false)} 
+                    width="max-w-md" 
+                    height="auto">
+                    <div className="text-black font-sans w-full h-full pt-4">
 
-                      {/* título */}
-                      <h2 className="text-xl text-center font-normal text-{#2D2D2D] mt-4 mb-4">
-                        Você está avaliando <span className="font-semibold">Rare Beauty</span>
-                      </h2>
+                        <h2 className="text-xl text-center font-normal text-[#2D2D2D] mt-4 mb-4">
+                            Você está avaliando <span className="font-semibold">Rare Beauty</span>
+                        </h2>
 
-                      {/* star */}
-                      <div className="flex justify-center gap-2 mb-6">
-                        {[1, 2, 3, 4, 5].map((star) => (
-                          <svg
-                            key={star}
-                            className="w-10 h-10 text-[#A880FF] fill-none stroke-current stroke-1 cursor-pointer hover:fill-[#A880FF] transition-colors"
-                            viewBox="0 0 24 24"
-                          >
-                            <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
-                          </svg>
-                        ))}
-                      </div>
-
-                      <textarea
-                        className="w-full p-4 rounded-xl border border-neutral-200 text-neutral-700 bg-white focus:outline-none text-xs placeholder-neutral-400 shadow-sm"
-                        defaultValue={text}
-                        placeholder="Avaliação da loja"
-                        rows={6}
-                        />
-                      <div className="flex flex-col gap-3 mt-8 items-center w-full">
-
-                        {/* Botão - deletar */}
-                        <button
-                          onClick={()=> {
-                            if(confirm("Tem certeza que deseja deletar?")){
-                              setIsModalOpen(false);
-                            }
-                          }}
-                          className="w-[85%] bg-[#E53E2E] text-white py-2.5 rounded-full text-xs font-semibold uppercase tracking-wider shadow-md hover:bg-red-700 transition-colors"
-                          >
-                            Deletar
-                          </button>
-
-                          {/* Botão - salvar */}
-                          <button
-                          onClick={()=>{
-                            alert("Avaliação atualizada!");
-                            setIsModalOpen(false);
-                          }}
-                          className="w-[85%] bg-[#633BFA] text-white py-2.5 rounded-full text-xs font-semibold uppercase tracking-wider shadow-md hover:bg-mediumpurple transition-colors"
-                          >
-                            Salvar 
-                          </button>
+                        <div className="flex justify-center gap-2 mb-6">
+                            {[1, 2, 3, 4, 5].map((star) => {
+                                const devePreencher = hoverEstrelas !== null ? star <= hoverEstrelas : star <= estrelasTemporarias;
+                                
+                                return (
+                                    <svg 
+                                        key={star} 
+                                        onClick={() => setEstrelasTemporarias(star)}
+                                        onMouseEnter={() => setHoverEstrelas(star)}
+                                        onMouseLeave={() => setHoverEstrelas(null)}
+                                        className={`w-10 h-10 text-[#A880FF] stroke-current stroke-1 cursor-pointer transition-colors ${
+                                            devePreencher ? "fill-[#A880FF]" : "fill-none"
+                                        }`} 
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                                    </svg>
+                                );
+                            })}
                         </div>
-                      </div>
-                    </Modal>
-                  )}
-                </div>
-  );
+
+                        <textarea
+                            className="w-full p-4 rounded-xl border border-neutral-200 text-neutral-700 bg-white focus:outline-none text-xs"
+                            value={textoTemporario}
+                            onChange={(e) => setTextoTemporario(e.target.value)}
+                            placeholder="Avaliação da loja"
+                            rows={6}
+                        />
+
+                        <div className="flex flex-col gap-3 mt-8 items-center w-full">
+                            <button
+                                onClick={handleDeletar}
+                                className="w-[85%] bg-[#E53E2E] text-white py-2.5 rounded-full text-xs font-semibold uppercase tracking-wider"
+                            >
+                                Deletar
+                            </button>
+
+                            <button
+                                onClick={handleSalvar}
+                                className="w-[85%] bg-[#633BFA] text-white py-2.5 rounded-full text-xs font-semibold uppercase tracking-wider"
+                            >
+                                Salvar
+                            </button>
+                        </div>
+                    </div>
+                </Modal>
+            )}
+        </div>
+    );
 }
-
-
-  
