@@ -8,105 +8,110 @@ import escuro from "../../public/telaloja_degrade.svg";
 import nome from "../../public/rareBeauty_loja.png";
 import StarRating from "@/components/StarRating";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { getLojasById, getReviewByLojaId } from "../services/lojaApi";
-import { LojaDetalhesResponse, LojaUsuarioResponse } from "../types/lojaTypes";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import {
+  getLojaByLojaId,
+  getReviewByLojaId,
+  postAddLojaReview,
+} from "../services/lojaApi";
+import {
+  LojaDetalhesResponse,
+  LojaReviewRequest,
+  LojaReviewResponse,
+  LojaUsuarioResponse,
+} from "../types/lojaTypes";
+import { decodeUserToken } from "../utils/auth";
+import { dataFortmatter } from "@/components/utils";
 
 interface TelaLojaProps {
   idLoja: number;
 }
 
-type Review = {
-  id: number;
-  userName: string;
-  userRating: number;
-  comment: string;
-  createdAt: string;
-};
-
 export default function LojaPage({ idLoja }: TelaLojaProps) {
   const router = useRouter();
 
-  const reviewPadrao: Review[] = [
-    {
-      id: 1,
-      userName: "Sofia Figueiredo",
-      userRating: 4.75,
-      comment:
-        "Os produtos são simplesmente perfeitos! A pigmentação do blush é surreal de boa, vale cada centavo.",
-      createdAt: "01/06/2026",
-    },
-  ];
-
-  const [reviews, setReviews] = useState<Review[]>([]);
+  const [reviews, setReviews] = useState<LojaReviewResponse[]>([]);
   const [inputName, setInputName] = useState("");
   const [inputComment, setInputComment] = useState("");
   const [userSelectedRating, setUserSelectedRating] = useState(5);
-  const [lojaDados, setLojaDados] = useState<LojaUsuarioResponse[]>();
+  const [lojaDados, setLojaDados] = useState<LojaDetalhesResponse>();
+  const [userData, setUserData] = useState<UserDataProps | null>(null);
 
   // ESTADOS: Autenticação e Controle do Modal e da avaliação.
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  console.log(idLoja);
+
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const query = searchParams.toString();
+  const urlComplete = query ? `${pathname}?${query}` : pathname;
+  const returnTo = encodeURIComponent(urlComplete);
+
+  const carregarLoja = async () => {
+    try {
+      const [lojaData, reviewData] = await Promise.all([
+        getLojaByLojaId(idLoja),
+        getReviewByLojaId(idLoja),
+      ]);
+      setLojaDados(lojaData);
+      setReviews(reviewData);
+    } catch (error) {
+      console.error("Erro ao buscar a loja:", error);
+    }
+  };
 
   useEffect(() => {
-    const carregarLoja = async () => {
-      try {
-        const data = await getLojasById(idLoja);
-        setLojaDados(data);
-      } catch (error) {
-        console.error("Erro ao buscar a loja:", error);
-      }
-    };
     if (idLoja) {
       carregarLoja();
     }
   }, [idLoja]);
 
   useEffect(() => {
-    const comentariosSalvos = localStorage.getItem("@rareBeauty:reviews");
-    if (comentariosSalvos) {
-      setReviews(JSON.parse(comentariosSalvos));
-    } else {
-      setReviews(reviewPadrao);
-    }
+    const token = localStorage.getItem("token");
+    if (token) {
+      setIsLoggedIn(true);
+      const userData = decodeUserToken(token);
+      setUserData(userData);
+    } else setIsLoggedIn(false);
   }, []);
 
-  useEffect(() => {
-    if (reviews.length > 0) {
-      localStorage.setItem("@rareBeauty:reviews", JSON.stringify(reviews));
-    }
-  }, [reviews]);
-
-  const calcularMedia = (listaDeReviews: Review[]) => {
-    if (listaDeReviews.length === 0) return 0;
-    const soma = listaDeReviews.reduce((acc, rev) => acc + rev.userRating, 0);
-    return soma / listaDeReviews.length;
+  const calcularMedia = () => {
+    return reviews && reviews.length > 0
+      ? reviews.reduce((acc, rev) => acc + rev.nota, 0) / reviews.length
+      : 0;
   };
 
-  const handleAddReview = (e: React.FormEvent) => {
+  const handleAddReview = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!inputName.trim() || !inputComment.trim()) return;
 
-    const newReview: Review = {
-      id: Date.now(),
-      userName: inputName,
-      userRating: userSelectedRating,
-      comment: inputComment,
-      createdAt: new Date().toLocaleDateString("pt-BR"),
+    if (!inputComment.trim()) return;
+
+    if (!userData) {
+      console.error("Usuário não autenticado ou sem ID!");
+      return;
+    }
+
+    const newReview: LojaReviewRequest = {
+      usuario_id: userData.userId,
+      loja_id: idLoja,
+      nota: userSelectedRating,
+      comentario: inputComment,
     };
 
-    const listaAtualizada = [newReview, ...reviews];
-    setReviews(listaAtualizada);
+    try {
+      await postAddLojaReview(newReview);
 
-    // Limpa os campos e fecha o modal
-    setInputName("");
-    setInputComment("");
-    setUserSelectedRating(5);
-    setIsModalOpen(false);
+      setInputName("");
+      setInputComment("");
+      setUserSelectedRating(5);
+      setIsModalOpen(false);
+
+      await carregarLoja();
+    } catch (error) {
+      console.error("Erro ao enviar avaliação:", error);
+    }
   };
-
-  const storeRating = calcularMedia(reviews);
 
   return (
     <div className="relative flex flex-col min-h-screen bg-black min-w-[1200px] overflow-x-auto">
@@ -114,25 +119,29 @@ export default function LojaPage({ idLoja }: TelaLojaProps) {
 
       {/* banner  */}
       <div className="relative w-full h-auto overflow-hidden">
-        <Image
-          src={escuro}
-          alt="Banner da loja"
-          className="w-full h-auto relative z-0"
-        />
+        <div className="flex w-full max-h-150 overflow-hidden">
+          <Image
+            src={lojaDados?.banner_url || escuro}
+            alt="Banner da loja"
+            width={400}
+            height={200}
+            className="w-full h-auto relative z-0"
+          />
+        </div>
         <Image
           src={escuro}
           alt="Degradê escuro"
           className="absolute inset-0 w-full h-full object-cover z-10 pointer-events-none"
         />
         <div className="absolute inset-0 z-20 flex flex-col items-center justify-center text-center px-4">
-          <div className="mb-2">{lojaDados?.nome}</div>
-          <p className="text-[#F6F3E4]/90 text-lg font-light lowercase tracking-widest -mt-7 -ml-98">
-            beleza
-          </p>
-          <p className="absolute bottom-6 right-12 text-[#F6F3E4]/90 text-sm tracking-wide">
-            by {lojaDados?.nome}
+          <div className="mb-2 text-9xl">{lojaDados?.nome}</div>
+          <p className="text-[#F6F3E4]/90 text-lg font-light lowercase tracking-widest -mt-7">
+            {lojaDados?.descricao}
           </p>
         </div>
+        <p className="absolute bottom-6 right-12 text-[#F6F3E4]/90 text-sm tracking-wide">
+          by {lojaDados?.usuario.nome}
+        </p>
       </div>
 
       {/* reviews e média */}
@@ -143,9 +152,9 @@ export default function LojaPage({ idLoja }: TelaLojaProps) {
 
         <div className="flex flex-col items-center gap-2">
           <span className="text-[#F6F3E4] text-5xl font-bold decoration-1 underline-offset-8">
-            {storeRating.toFixed(2)}
+            {calcularMedia().toFixed(2)}
           </span>
-          <StarRating rating={storeRating} />
+          <StarRating rating={calcularMedia()} />
         </div>
 
         {/* CONDICIONAL: Mostra o Botão de Avaliar ou o Card de Login */}
@@ -166,7 +175,7 @@ export default function LojaPage({ idLoja }: TelaLojaProps) {
               avaliação.
             </p>
             <button
-              onClick={() => router.push("/login")}
+              onClick={() => router.push(`/login?returnTo=${returnTo}`)}
               className="bg-purple-600 text-white px-8 py-3 rounded-full font-semibold hover:bg-purple-700 transition-all text-sm shadow-lg transform hover:scale-105"
             >
               Fazer Login para Avaliar
@@ -197,18 +206,6 @@ export default function LojaPage({ idLoja }: TelaLojaProps) {
               <h3 className="text-[#F6F3E4] text-xl font-medium mb-2">
                 Deixe sua avaliação
               </h3>
-
-              {/* Input do Nome */}
-              <div className="flex flex-col gap-1">
-                <label className="text-[#F6F3E4]/70 text-sm">Seu Nome</label>
-                <input
-                  type="text"
-                  value={inputName}
-                  onChange={(e) => setInputName(e.target.value)}
-                  placeholder="Ex: Sofia Figueiredo"
-                  className="bg-black text-[#F6F3E4] border border-purple-500/30 rounded-lg px-4 py-2 focus:outline-none focus:border-purple-500 text-sm"
-                />
-              </div>
 
               {/* Input do Comentário */}
               <div className="flex flex-col gap-1">
@@ -253,35 +250,41 @@ export default function LojaPage({ idLoja }: TelaLojaProps) {
                 pathname: "/com_aval",
                 query: {
                   id: rev.id,
-                  name: rev.userName,
-                  text:
-                    rev.comment || "Os produtos são simplesmente perfeitos...",
-                  rating: rev.userRating,
                 },
               }}
               className="bg-[#F6F3E4] text-black w-full rounded-2xl block hover:opacity-90 transition-opacity cursor-pointer p-4"
             >
               <div className="flex items-start justify-between w-full">
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-neutral-300 rounded-full overflow-hidden flex items-center justify-center font-bold">
-                    {rev.userName ? rev.userName.charAt(0).toUpperCase() : "U"}
+                  <div className="w-12 h-12 bg-neutral-300 rounded-full overflow-hidden flex items-center justify-center font-bold text-neutral-600">
+                    {rev.usuario.foto_perfil_url ? (
+                      <Image
+                        src={rev.usuario.foto_perfil_url}
+                        alt={`Foto de perfil de ${rev.usuario.nome}`}
+                        width={48}
+                        height={48}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <span>{rev.usuario.nome?.charAt(0).toUpperCase()}</span>
+                    )}
                   </div>
                   <div className="flex flex-col">
                     <span className="font-semibold text-lg leading-tight">
-                      {rev.userName}
+                      {rev.usuario.nome}
                     </span>
                     <span className="text-xs text-neutral-500">
-                      {rev.createdAt}
+                      {dataFortmatter(rev.createdAt)}
                     </span>
                   </div>
                 </div>
                 <div className="shrink-0">
-                  <StarRating rating={rev.userRating} />
+                  <StarRating rating={rev.nota} />
                 </div>
               </div>
               <div className="pl-16">
                 <p className="text-neutral-700 text-sm leading-relaxed break-words">
-                  "{rev.comment}"
+                  {rev.comentario}
                 </p>
               </div>
             </Link>

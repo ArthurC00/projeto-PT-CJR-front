@@ -13,7 +13,7 @@ import { decodeUserToken } from "../utils/auth";
 import { getOneUser } from "../services/usersApi";
 import { getProductById, ProdutoListagem } from "../services/productApi";
 import { LojaUsuarioResponse } from "../types/lojaTypes";
-import { getLojasById } from "../services/lojaApi";
+import { getLojasByUserId } from "../services/lojaApi";
 
 interface ProfilePageProps {
   userId: number;
@@ -54,7 +54,7 @@ export default function ProfilePage({ userId }: ProfilePageProps) {
           await Promise.all([
             getOneUser(userId),
             getProductById(userId),
-            getLojasById(userId).catch(() => null),
+            getLojasByUserId(userId).catch(() => null),
           ]);
 
         setUserData(userDataResponse);

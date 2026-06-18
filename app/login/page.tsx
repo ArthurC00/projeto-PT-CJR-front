@@ -1,8 +1,8 @@
 // coisas da integração
 "use client";
 import { useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { Eye, EyeOff } from "lucide-react"
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { Eye, EyeOff } from "lucide-react";
 
 // coisas da própria tela de login
 import Link from "next/link";
@@ -13,9 +13,14 @@ import { decodeUserToken } from "../utils/auth";
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false)
+  const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
+
+  const query = searchParams.toString();
+  const urlComplete = query ? `${pathname}?${query}` : pathname;
+  const returnTo = encodeURIComponent(urlComplete);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,7 +37,7 @@ export default function Login() {
           if (returnTo) {
             router.push(returnTo);
           } else {
-            router.push(`/profile/${userData?.userId}`);
+            router.push(`/feed`);
           }
         }
       }
@@ -86,7 +91,7 @@ export default function Login() {
           <div className="relative w-full">
             <input
               required
-              type= {showPassword ? "text" : "password"}
+              type={showPassword ? "text" : "password"}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               name="senha"
@@ -95,10 +100,11 @@ export default function Login() {
               className="bg-[#FFFFFF] text-black rounded-full my-3 h-12 w-full pl-8 focus:outline-none focus:ring-2 focus:ring-[#6A38F3]"
             />
             <button
-            type="button"
-            onClick={() => setShowPassword((prev) => !prev)}
-            className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700">
-              {showPassword ? <EyeOff size={20}/> : <Eye size={20}/>}
+              type="button"
+              onClick={() => setShowPassword((prev) => !prev)}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+            >
+              {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
             </button>
           </div>
 
