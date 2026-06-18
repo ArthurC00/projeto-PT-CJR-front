@@ -5,6 +5,9 @@ export const getOneUser = async (userId: number) => {
     const response = await api.get(`/usuarios/${userId}`);
     return response.data;
   } catch (e: any) {
-    throw new Error(e.response?.data?.message || e.message);
+    throw {
+      status: e.response?.status,
+      message: e.reponse?.data?.message || e.message,
+    };
   }
 };

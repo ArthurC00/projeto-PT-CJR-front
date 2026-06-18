@@ -1,4 +1,4 @@
-import ProfilePage from "../ProfilePage";
+import ProfilePage from "../../produto/ProfilePage";
 
 interface ProfileParams {
   params: Promise<{

@@ -26,3 +26,35 @@ export const DeleteProduct = async (id: number) => {
     throw new Error(e.response?.data?.message || e.message);
   }
 };
+
+export interface ProdutoListagem {
+  id: number;
+  nome: string;
+  preco: string | number;
+  estoque: number;
+  descricao: string;
+  loja_id: number;
+  categoria_id: number;
+  loja: {
+    banner_url: string | null;
+  };
+  categoria: {
+    id: number;
+    nome: string;
+  };
+  imagens: {
+    url_imagem: string;
+    ordem: number;
+  }[];
+}
+
+export const getProductById = async (
+  id: number,
+): Promise<ProdutoListagem[]> => {
+  try {
+    const reponse = await api.get(`produto/usuario/${id}`);
+    return reponse.data;
+  } catch (e: any) {
+    throw new Error(e.response?.data?.message || e.message);
+  }
+};

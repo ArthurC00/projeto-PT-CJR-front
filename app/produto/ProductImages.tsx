@@ -22,9 +22,9 @@ export default function ProductImages({ imagens, nome }: ProductImagesProps) {
     <div className="flex gap-5">
       <div className="flex flex-col gap-2">
         {imagens && imagens.length > 0 ? (
-          imagens.map((img) => (
+          imagens.map((img, index) => (
             <img
-              key={img.id}
+              key={img.url_imagem || index}
               src={img.url_imagem}
               alt={`Imagem ${img.ordem}`}
               onClick={() => setImagemPrincipal(img.url_imagem)}
