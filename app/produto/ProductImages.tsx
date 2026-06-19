@@ -18,6 +18,7 @@ export default function ProductImages({ imagens, nome }: ProductImagesProps) {
     imagens && imagens.length > 0 ? imagens[0].url_imagem : "",
   );
 
+
   return (
     <div className="flex gap-5">
       <div className="flex flex-col gap-2">

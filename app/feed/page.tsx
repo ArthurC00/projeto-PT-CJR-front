@@ -41,7 +41,7 @@ export default async function FeedPage() {
 
       {/* categorias */}
       {categorias.length > 0 ? (
-        <div className="justify-items-center justify-around">
+        <div className="justify-around">
           <h1 className="text-black text-4xl font-bold ml-40 relative top-15 tracking-wider">
             Categorias
           </h1>

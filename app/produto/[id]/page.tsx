@@ -93,6 +93,11 @@ export default function ProductPage({ params }: ProductPageProps) {
     );
   }
 
+  function isUrlValida(url?: string | null) {
+  if (!url) return false
+  return url.startsWith("http://") || url.startsWith("https://") || url.startsWith("/")
+}
+
   return (
     <div className="min-h-screen text-black w-full bg-[#F6F3E4] font-['League_Spartan'] pb-24 overflow-x-hidden">
       <Navbar />
@@ -165,9 +170,9 @@ export default function ProductPage({ params }: ProductPageProps) {
                 className="flex-shrink-0 snap-start w-[85vw] md:w-[calc(50%-15px)] bg-white rounded-[24px] md:rounded-[31px] flex relative p-5 md:p-6 items-start md:items-center min-h-[180px]"
               >
                 <div className="w-14 h-14 md:w-20 md:h-20 bg-[#D9D9D9] rounded-full flex-shrink-0 mt-2 md:mt-0">
-                  {review.usuario.foto_perfil_url ? (
+                  {isUrlValida(review.usuario.foto_perfil_url) ? (
                     <Image
-                      src={review.usuario.foto_perfil_url}
+                      src={review.usuario.foto_perfil_url!}
                       alt="Logo da loja"
                       width={48}
                       height={48}
@@ -215,7 +220,7 @@ export default function ProductPage({ params }: ProductPageProps) {
                 }}
               >
                 <div className="absolute top-[16px] right-[16px] w-[68px] h-[68px] bg-gray-200 rounded-full z-10 overflow-hidden">
-                  {product.loja.banner_url ? (
+                  {isUrlValida(product.loja.banner_url) ? (
                     <Image
                       src={product.loja.banner_url}
                       alt="Logo da loja"
