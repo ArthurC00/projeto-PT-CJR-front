@@ -37,7 +37,6 @@ export default function Login() {
         }
       }
     } catch (error: any) {
-      console.error(error.response?.data);
       alert(
         "Erro ao logar: " +
           (error.response?.data?.message || "servidor offline"),
