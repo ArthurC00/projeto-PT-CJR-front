@@ -1,8 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import Navbar from "@/components/navbar";
-import { getCategorias, getProdutos, getCategoriasRaiz } from "../services/api";
+import { getCategorias, getCategoriasRaiz } from "../services/api";
 import type { Categoria, Produto } from "../services/api";
+import { getProdutos } from "../services/productApi";
+
+export const dynamic = "force-dynamic";
 
 export default async function FeedPage() {
   const categorias: Categoria[] = await getCategoriasRaiz();
@@ -67,7 +70,7 @@ export default async function FeedPage() {
         {produtos.length > 0 ? (
           <div className="grid grid-cols-5 gap-2 mt-20 ml-20">
             {produtos.map((produto: Produto) => (
-              <Link key={produto.id} href={`/produto/${produto.id}`}> 
+              <Link key={produto.id} href={`/produto/${produto.id}`}>
                 <div className="flex flex-col rounded-4xl object-cover bg-gray-100 w-70 h-90 justify-center items-center hover:bg-gray-200">
                   {produto.imagens && produto.imagens.length > 0 ? (
                     <div className="">

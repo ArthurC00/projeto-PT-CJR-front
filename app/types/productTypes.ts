@@ -24,6 +24,7 @@ export interface ProductResponse {
   descricao: string;
   loja_id: number;
   categoria_id: number;
+  avaliacoes: ReviewProduct[];
   loja: ProductLoja;
   categoria: ProductCategoria;
   imagens: ProductImage[];

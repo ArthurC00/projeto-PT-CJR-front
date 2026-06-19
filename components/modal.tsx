@@ -12,11 +12,11 @@ import Image from "next/image";
 interface modalTemplate {
     onClose: () => void; // só aceita uma função com retorno vazio (serve para fechar o modal)
     children: ReactNode; // ReactNode é o tipo de variável que recebe o conteúdo do modal (HTML, CSS ou qualquer coisa que o React aceite)
-    height: string; // altura que a caixa do modal deve ocupar
-    width: string; // largura que a caixa do modal deve ocupar
+    height?: string; // altura que a caixa do modal deve ocupar
+    width?: string; // largura que a caixa do modal deve ocupar
 }
 
-export default function Modal({onClose, children, height, width}:modalTemplate) {
+export default function Modal({onClose, children, height = "auto", width = "auto"}:modalTemplate) {
     // passa os parâmetros estabelecidos no template para a função modal
         return (
             <div className="fixed inset-0 z-50 flex items-center justify-center">

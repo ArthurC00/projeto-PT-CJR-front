@@ -45,7 +45,7 @@ export default function Navbar() {
   };
 
   return isLogged ? (
-    <nav className="flex justify-between min-h-15 min-w-screen bg-black justify-items-center ">
+    <nav className="flex justify-between min-h-15 max-w-screen bg-black justify-items-center ">
       <h1>
         <Link href="/feed">
           <Image

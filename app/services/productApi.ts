@@ -39,6 +39,17 @@ export const getProductByUserId = async (
   }
 };
 
+export const getProductByLojaId = async (
+  id: number,
+): Promise<ProductResponse[]> => {
+  try {
+    const reponse = await api.get(`produto/loja/${id}`);
+    return reponse.data;
+  } catch (e: any) {
+    throw new Error(e.response?.data?.message || e.message);
+  }
+};
+
 export const getOneProduct = async (id: string) => {
   try {
     const response = await api.get(`/produto/${id}`);

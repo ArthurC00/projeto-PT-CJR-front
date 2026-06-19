@@ -193,7 +193,7 @@ export default function ProfilePage({ userId }: ProfilePageProps) {
                         {product.nome}
                       </h4>
                       <p className="text-[21px] font-medium text-black mt-1">
-                        {`R$ ${product.preco}`}
+                        {`R$ ${Number(product.preco).toFixed(2)}`}
                       </p>
                       <span
                         className={`text-[13px] font-medium block mt-1 ${

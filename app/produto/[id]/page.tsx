@@ -30,6 +30,7 @@ export default function ProductPage({ params }: ProductPageProps) {
   const [relatedProducts, setRelatedProducts] = useState<ProductResponse[]>([]);
   const [reviews, setReviews] = useState<ReviewProduct[]>();
   const [isLoading, setIsLoading] = useState(true);
+  const [countdown, setCountdown] = useState(3);
 
   const fetchPageData = async () => {
     try {
@@ -55,6 +56,24 @@ export default function ProductPage({ params }: ProductPageProps) {
   useEffect(() => {
     fetchPageData();
   }, [id]);
+
+  useEffect(() => {
+    if (isLoading) return;
+
+    if (productData) console.log(productData);
+  }, [productData, isLoading]);
+
+  useEffect(() => {
+    if (isLoading) return;
+    if (productData) return;
+    if (countdown === 0) {
+      router.push("/feed");
+      return;
+    }
+
+    const timer = setInterval(() => setCountdown((prev) => prev - 1), 1000);
+    return () => clearInterval(timer);
+  }, [isLoading, productData, countdown, router]);
 
   if (isLoading) {
     return (
@@ -90,20 +109,26 @@ export default function ProductPage({ params }: ProductPageProps) {
             <OwnerActions
               productOwnerId={productData.loja.usuario_id}
               produtoData={productData}
+              onClick={() => fetchPageData()}
             />
           </div>
 
           <div className="flex items-center gap-[28px] mt-6 whitespace-nowrap">
-            <div className="flex items-center gap-1">
-              <div className="w-[17px] h-[17px] rounded-[0.5px] flex items-center justify-center">
-                <Star fill="#FFEB3A" stroke="#000000" strokeWidth={0.5} />
+            {productData.avaliacoes.length > 0 ? (
+              <div className="flex items-center gap-1">
+                <div className="w-[17px] h-[17px] rounded-[0.5px] -mt-1 flex items-center justify-center">
+                  <Star fill="#FFEB3A" stroke="#000000" strokeWidth={0.5} />
+                </div>
+                <span className="flex gap-1 font-light text-[18px] text-black">
+                  <p>{`${0} | ` || ""}</p>
+                  <p> {productData.avaliacoes.length}</p>
+                </span>
               </div>
-              <span className="font-light text-[18px] text-black">
-                4.5 | 15 reviews
-              </span>
-            </div>
+            ) : (
+              <p>Ainda não avaliado</p>
+            )}
             <span className="font-light text-[18px] leading-[17px] text-[#6A38F3]">
-              {productData.categoria?.nome || "mercado"}
+              {productData.categoria?.nome || ""}
             </span>
             <span className="font-light text-[18px] leading-[17px] text-[#6A38F3]">
               {productData.estoque} disponíveis

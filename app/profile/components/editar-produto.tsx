@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { DeleteProduct, PatchEditProduct } from "@/app/services/productApi";
 
 interface EditarProdutoProps {
-  onClose: () => void;
+  onClose: (deleted?: boolean) => void;
   produtoData: {
     id: number;
     nome: string;
@@ -77,7 +77,7 @@ export default function EditarProduto({
 
     try {
       await PatchEditProduct(produtoData.id, formData);
-      onClose();
+      onClose(false);
       router.refresh();
     } catch (error: any) {
       console.error("Erro ao editar produto:", error);
@@ -92,15 +92,16 @@ export default function EditarProduto({
 
     try {
       await DeleteProduct(produtoData.id);
-      onClose();
-      router.push("/");
+      onClose(true);
+      router.push("/feed");
+      router.refresh();
     } catch (error: any) {
       console.error("Erro ao deletar produto:", error);
     }
   };
 
   return (
-    <Modal onClose={onClose} height="90vh" width="min(1020px, 90vw)">
+    <Modal onClose={onClose} height="90vh" width="min(1020px, 40vw)">
       <div className="w-full h-full flex flex-col items-center font-['League_Spartan'] text-black py-2">
         <h1 className="text-[32px] md:text-[42px] leading-tight font-normal mb-2 text-center shrink-0">
           Editar Produto
