@@ -11,9 +11,10 @@ import nonProfile from "../../public/profile/nonProfile.png";
 import emailIcon from "../../public/profile/iconEmail.svg";
 import { decodeUserToken } from "../utils/auth";
 import { getOneUser } from "../services/usersApi";
-import { getProductById, ProdutoListagem } from "../services/productApi";
+import { getProductByUserId } from "../services/productApi";
 import { LojaUsuarioResponse } from "../types/lojaTypes";
 import { getLojasByUserId } from "../services/lojaApi";
+import { ProductResponse } from "../types/productTypes";
 
 interface ProfilePageProps {
   userId: number;
@@ -24,7 +25,7 @@ export default function ProfilePage({ userId }: ProfilePageProps) {
 
   const [myId, setMyId] = useState<number>(0);
   const [userData, setUserData] = useState<UserDataProps>();
-  const [userProducts, setUserProducts] = useState<ProdutoListagem[]>([]);
+  const [userProducts, setUserProducts] = useState<ProductResponse[]>([]);
   const [minhasLojas, setMinhasLojas] = useState<LojaUsuarioResponse[] | null>(
     null,
   );
@@ -53,7 +54,7 @@ export default function ProfilePage({ userId }: ProfilePageProps) {
         const [userDataResponse, productsResponse, lojasResponse] =
           await Promise.all([
             getOneUser(userId),
-            getProductById(userId),
+            getProductByUserId(userId),
             getLojasByUserId(userId).catch(() => null),
           ]);
 

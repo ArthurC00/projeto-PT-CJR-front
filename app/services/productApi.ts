@@ -1,3 +1,4 @@
+import { ProductResponse } from "../types/productTypes";
 import { api } from "./api";
 
 export const PostCreateProduct = async (body: any) => {
@@ -27,34 +28,43 @@ export const DeleteProduct = async (id: number) => {
   }
 };
 
-export interface ProdutoListagem {
-  id: number;
-  nome: string;
-  preco: string | number;
-  estoque: number;
-  descricao: string;
-  loja_id: number;
-  categoria_id: number;
-  loja: {
-    banner_url: string | null;
-  };
-  categoria: {
-    id: number;
-    nome: string;
-  };
-  imagens: {
-    url_imagem: string;
-    ordem: number;
-  }[];
-}
-
-export const getProductById = async (
+export const getProductByUserId = async (
   id: number,
-): Promise<ProdutoListagem[]> => {
+): Promise<ProductResponse[]> => {
   try {
     const reponse = await api.get(`produto/usuario/${id}`);
     return reponse.data;
   } catch (e: any) {
     throw new Error(e.response?.data?.message || e.message);
+  }
+};
+
+export const getOneProduct = async (id: string) => {
+  try {
+    const response = await api.get(`/produto/${id}`);
+    return response.data;
+  } catch (error: any) {
+    throw new Error(error.message);
+  }
+};
+
+export const getProdutos = async () => {
+  try {
+    const response = await api.get("/produto");
+    return response.data;
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+};
+
+export const getProductsReviewByProductId = async (id: string) => {
+  try {
+    const response = await api.get(`/avaliacoes-produto/product/${id}`);
+    return response.data;
+  } catch (e: any) {
+    throw {
+      status: e.response?.status,
+      message: e.response?.data?.message || e.message,
+    };
   }
 };

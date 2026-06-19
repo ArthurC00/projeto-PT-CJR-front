@@ -103,24 +103,6 @@ export const postCadastro = async (body: Cadastro) => {
   }
 };
 
-export const getOneProduct = async (id: string) => {
-  try {
-    const response = await api.get(`/produto/${id}`);
-    return response.data;
-  } catch (error: any) {
-    throw new Error(error.message);
-  }
-};
-
-export const getProdutos = async () => {
-  try {
-    const response = await api.get("/produto");
-    return response.data;
-  } catch (e: any) {
-    throw new Error(e.message);
-  }
-};
-
 export const getCategorias = async () => {
   try {
     const response = await api.get("/categorias");
