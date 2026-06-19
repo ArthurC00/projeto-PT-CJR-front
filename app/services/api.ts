@@ -90,7 +90,7 @@ export const postLogin = async (body: Login) => {
     const response = await api.post(`/login`, body);
     return response.data.token;
   } catch (e: any) {
-    throw new Error(e.message);
+    throw e;
   }
 };
 
