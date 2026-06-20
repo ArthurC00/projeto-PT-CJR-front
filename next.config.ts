@@ -2,16 +2,15 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "picsum.photos",
-        pathname: "/**",
+        hostname: "**",
       },
       {
-        protocol: "https",
-        hostname: "loremflickr.com",
-        pathname: "/**",
+        protocol: "http",
+        hostname: "**",
       },
     ],
   },

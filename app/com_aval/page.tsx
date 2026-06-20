@@ -95,6 +95,7 @@ export default function com_aval() {
 
     try {
       await postReviewCommentByReviewId(newComment);
+      fetchPageData();
     } catch (e) {
       console.error(e);
     } finally {

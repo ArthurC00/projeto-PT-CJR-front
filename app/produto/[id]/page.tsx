@@ -4,16 +4,22 @@ import { useState, useEffect, use } from "react";
 import {
   getOneProduct,
   getProductsReviewByProductId,
+  getProductByUserId,
+  postProductReview,
+  updateProductReview,
+  deleteProductReview,
 } from "@/app/services/productApi";
 import Navbar from "@/components/navbar";
 import ProductStars from "@/components/productStart";
-import { Star } from "lucide-react";
+import { Star, ChevronLeft, ChevronRight } from "lucide-react";
 import ProductImages from "../ProductImages";
 import OwnerActions from "@/components/ownerActions";
-import { getProductByUserId } from "@/app/services/productApi";
 import { ProductResponse, ReviewProduct } from "@/app/types/productTypes";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { decodeUserToken } from "@/app/utils/auth";
+import Modal from "@/components/modal";
+
 export const dynamic = "force-dynamic";
 
 interface ProductPageProps {
@@ -30,7 +36,114 @@ export default function ProductPage({ params }: ProductPageProps) {
   const [relatedProducts, setRelatedProducts] = useState<ProductResponse[]>([]);
   const [reviews, setReviews] = useState<ReviewProduct[]>();
   const [isLoading, setIsLoading] = useState(true);
+  const [reviewIndex, setReviewIndex] = useState(0);
+  const [relatedIndex, setRelatedIndex] = useState(0);
   const [countdown, setCountdown] = useState(3);
+
+  const [isLogged, setIsLogged] = useState(false);
+  const [isOwner, setIsOwner] = useState(false);
+  const [currentUserId, setCurrentUserId] = useState<number | null>(null);
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [newRating, setNewRating] = useState(5);
+  const [newComment, setNewComment] = useState("");
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+  const [hoverEstrelas, setHoverEstrelas] = useState<number | null>(null);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      try {
+        const decoded = decodeUserToken(token);
+        if (decoded) {
+          setIsLogged(true);
+          setCurrentUserId(decoded.userId);
+          if (productData && decoded.userId === productData.loja.usuario_id) {
+            setIsOwner(true);
+          } else {
+            setIsOwner(false);
+          }
+        }
+      } catch (e) {
+        console.error("Erro ao decodificar token:", e);
+      }
+    }
+  }, [productData]);
+
+  const openReviewModal = () => {
+    const userReview = reviews?.find((r) => r.usuario_id === currentUserId);
+    if (userReview) {
+      setNewRating(userReview.nota);
+      setNewComment(userReview.comentario);
+    } else {
+      setNewRating(5);
+      setNewComment("");
+    }
+    setIsReviewModalOpen(true);
+  };
+
+  const handleReviewSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!currentUserId || !productData) return;
+    if (!newComment.trim()) {
+      alert("Por favor, escreva um comentário.");
+      return;
+    }
+
+    try {
+      setIsSubmittingReview(true);
+      const userReview = reviews?.find((r) => r.usuario_id === currentUserId);
+
+      if (userReview) {
+        await updateProductReview(userReview.id, {
+          nota: newRating,
+          comentario: newComment,
+        });
+      } else {
+        await postProductReview({
+          usuario_id: currentUserId,
+          produto_id: productData.id,
+          nota: newRating,
+          comentario: newComment,
+        });
+      }
+
+      setNewComment("");
+      setNewRating(5);
+      setIsReviewModalOpen(false);
+
+      const updatedReviews = await getProductsReviewByProductId(id);
+      setReviews(updatedReviews);
+    } catch (e: any) {
+      console.error("Erro ao enviar avaliação:", e);
+      alert(e.message || "Ocorreu um erro ao enviar a avaliação.");
+    } finally {
+      setIsSubmittingReview(false);
+    }
+  };
+
+  const handleReviewDelete = async () => {
+    if (!currentUserId || !productData) return;
+    const userReview = reviews?.find((r) => r.usuario_id === currentUserId);
+    if (!userReview) return;
+
+    if (confirm("Tem certeza absoluta que deseja deletar sua avaliação?")) {
+      try {
+        setIsSubmittingReview(true);
+        await deleteProductReview(userReview.id);
+        setNewComment("");
+        setNewRating(5);
+        setIsReviewModalOpen(false);
+
+        const updatedReviews = await getProductsReviewByProductId(id);
+        setReviews(updatedReviews);
+      } catch (e: any) {
+        console.error("Erro ao deletar avaliação:", e);
+        alert(e.message || "Ocorreu um erro ao deletar a avaliação.");
+      } finally {
+        setIsSubmittingReview(false);
+      }
+    }
+  };
 
   const fetchPageData = async () => {
     try {
@@ -72,8 +185,47 @@ export default function ProductPage({ params }: ProductPageProps) {
     }
 
     const timer = setInterval(() => setCountdown((prev) => prev - 1), 1000);
-    return () => clearInterval(timer);
   }, [isLoading, productData, countdown, router]);
+
+  const handleNextReview = () => {
+    if (reviews) {
+      const maxIndex = Math.max(0, reviews.length - 2);
+      if (reviewIndex < maxIndex) {
+        setReviewIndex((prev) => prev + 1);
+      }
+    }
+  };
+
+  const handlePrevReview = () => {
+    if (reviewIndex > 0) {
+      setReviewIndex((prev) => prev - 1);
+    }
+  };
+
+  const filteredRelatedProducts = relatedProducts.filter(
+    (product) => product.id !== productData?.id,
+  );
+
+  const handleNextRelated = () => {
+    const maxIndex = Math.max(0, filteredRelatedProducts.length - 2);
+    if (relatedIndex < maxIndex) {
+      setRelatedIndex((prev) => prev + 1);
+    }
+  };
+
+  const handlePrevRelated = () => {
+    if (relatedIndex > 0) {
+      setRelatedIndex((prev) => prev - 1);
+    }
+  };
+
+  const visibleReviews = reviews
+    ? reviews.slice(reviewIndex, reviewIndex + 2)
+    : [];
+  const visibleRelated = filteredRelatedProducts.slice(
+    relatedIndex,
+    relatedIndex + 2,
+  );
 
   if (isLoading) {
     return (
@@ -94,20 +246,33 @@ export default function ProductPage({ params }: ProductPageProps) {
   }
 
   function isUrlValida(url?: string | null) {
-  if (!url) return false
-  return url.startsWith("http://") || url.startsWith("https://") || url.startsWith("/")
-}
+    if (!url) return false;
+    return (
+      url.startsWith("http://") ||
+      url.startsWith("https://") ||
+      url.startsWith("/")
+    );
+  }
+
+  const totalReviews = reviews ? reviews.length : 0;
+
+  const mediaNotas =
+    reviews && reviews.length > 0
+      ? (reviews.reduce((acc, r) => acc + r.nota, 0) / reviews.length).toFixed(
+          1,
+        )
+      : "0";
 
   return (
-    <div className="min-h-screen text-black w-full bg-[#F6F3E4] font-['League_Spartan'] pb-24 overflow-x-hidden">
+    <div className="min-h-screen text-black w-full bg-[#F6F3E4] pb-24 overflow-x-hidden">
       <Navbar />
 
-      <main className="max-w-[1440px] mx-auto px-8 lg:px-[172px] mt-16 flex flex-col lg:flex-row gap-[172px]">
+      <main className="max-w-7xl mx-auto px-8 lg:px-44 mt-16 flex flex-col lg:flex-row gap-44">
         <ProductImages imagens={productData.imagens} nome={productData.nome} />
 
-        <div className="flex flex-col w-full lg:w-[418px] relative">
+        <div className="flex flex-col w-full lg:w-96 relative">
           <div className="flex justify-between items-center gap-2 w-full">
-            <h1 className="font-normal text-[40px] leading-[37px] text-black w-[362px]">
+            <h1 className="font-normal text-4xl leading-tight text-black w-80">
               {productData.nome}
             </h1>
 
@@ -118,81 +283,126 @@ export default function ProductPage({ params }: ProductPageProps) {
             />
           </div>
 
-          <div className="flex items-center gap-[28px] mt-6 whitespace-nowrap">
-            {productData.avaliacoes.length > 0 ? (
+          <div className="flex items-center gap-7 mt-6 whitespace-nowrap">
+            {totalReviews > 0 ? (
               <div className="flex items-center gap-1">
-                <div className="w-[17px] h-[17px] rounded-[0.5px] -mt-1 flex items-center justify-center">
+                <div className="w-4 h-4 rounded-sm -mt-1 flex items-center justify-center">
                   <Star fill="#FFEB3A" stroke="#000000" strokeWidth={0.5} />
                 </div>
-                <span className="flex gap-1 font-light text-[18px] text-black">
-                  <p>{`${0} | ` || ""}</p>
-                  <p> {productData.avaliacoes.length}</p>
+                <span className="flex gap-1 font-light text-lg text-black">
+                  <p>{`${mediaNotas} | `}</p>
+                  <p> {totalReviews} reviews</p>
                 </span>
               </div>
             ) : (
               <p>Ainda não avaliado</p>
             )}
-            <span className="font-light text-[18px] leading-[17px] text-[#6A38F3]">
+            <span className="font-light text-lg leading-none text-[#6A38F3]">
               {productData.categoria?.nome || ""}
             </span>
-            <span className="font-light text-[18px] leading-[17px] text-[#6A38F3]">
+            <span className="font-light text-lg leading-none text-[#6A38F3]">
               {productData.estoque} disponíveis
             </span>
           </div>
 
-          <h2 className="font-normal text-[40px] leading-[38px] mt-[15px]">
+          <h2 className="font-normal text-4xl leading-tight mt-4">
             R$ {Number(productData.preco).toFixed(2).replace(".", ",")}
           </h2>
 
-          <div className="mt-[29px]">
-            <h3 className="font-normal text-[21px] leading-[19px]">
-              Descrição
-            </h3>
-            <div className="w-[19px] h-[3px] bg-[#C7C7C7] rounded-[4px] mt-[3px] mb-[9px]"></div>
+          <div className="mt-7">
+            <h3 className="font-normal text-xl leading-none">Descrição</h3>
+            <div className="w-5 h-1 bg-[#C7C7C7] rounded mt-1 mb-2"></div>
 
-            <p className="font-light text-[13px] leading-[14px] text-black whitespace-pre-wrap text-justify">
+            <p className="font-light text-sm leading-tight text-black whitespace-pre-wrap text-justify">
               {productData.descricao}
             </p>
           </div>
         </div>
       </main>
 
-      <section className="max-w-[1440px] mx-auto mt-16 md:mt-[120px] px-4 md:px-8 lg:px-[123px]">
-        <h2 className="font-normal text-3xl md:text-[40px] md:leading-[37px] mb-6 md:mb-8">
-          Avaliações
-        </h2>
+      <section className="max-w-7xl mx-auto mt-16 md:mt-28 px-4 md:px-8 lg:px-28 w-full">
+        <div className="flex justify-between items-center w-full mb-6 md:mb-8">
+          <div className="flex gap-4 items-center">
+            <h2 className="font-normal text-3xl md:text-4xl md:leading-tight text-black">
+              Avaliações
+            </h2>
+            {isLogged && !isOwner && (
+              <button
+                onClick={openReviewModal}
+                className="bg-[#6A38F3] text-white px-4 py-2 rounded-full font-medium hover:bg-purple-700 transition-all text-sm shadow-md cursor-pointer"
+              >
+                {reviews?.some((r) => r.usuario_id === currentUserId)
+                  ? "Editar minha avaliação"
+                  : "Avaliar Produto"}
+              </button>
+            )}
+          </div>
+          {reviews && reviews.length > 2 && (
+            <div className="flex gap-2">
+              <button
+                onClick={handlePrevReview}
+                disabled={reviewIndex === 0}
+                className={`w-10 h-10 rounded-full flex items-center justify-center border border-black/10 transition-all ${
+                  reviewIndex === 0
+                    ? "opacity-30 cursor-not-allowed bg-white/50 text-black/40"
+                    : "bg-white text-black hover:bg-purple-600 hover:text-white cursor-pointer active:scale-95 shadow-sm"
+                }`}
+              >
+                <ChevronLeft size={20} />
+              </button>
+              <button
+                onClick={handleNextReview}
+                disabled={reviewIndex >= reviews.length - 2}
+                className={`w-10 h-10 rounded-full flex items-center justify-center border border-black/10 transition-all ${
+                  reviewIndex >= reviews.length - 2
+                    ? "opacity-30 cursor-not-allowed bg-white/50 text-black/40"
+                    : "bg-white text-black hover:bg-purple-600 hover:text-white cursor-pointer active:scale-95 shadow-sm"
+                }`}
+              >
+                <ChevronRight size={20} />
+              </button>
+            </div>
+          )}
+        </div>
 
-        {reviews ? (
-          <div className="flex overflow-x-auto gap-[15px] md:gap-[30px] pb-6 scrollbar-none snap-x snap-mandatory">
-            {reviews.map((review) => (
+        {reviews && reviews.length > 0 ? (
+          <div className="grid grid-cols-2 gap-4 md:gap-6 w-full">
+            {visibleReviews.map((review) => (
               <div
                 key={review.id}
-                className="flex-shrink-0 snap-start w-[85vw] md:w-[calc(50%-15px)] bg-white rounded-[24px] md:rounded-[31px] flex relative p-5 md:p-6 items-start md:items-center min-h-[180px]"
+                onClick={() => router.push(`/com_aval?id=${review.id}`)}
+                className="w-full bg-white rounded-3xl p-6 md:p-8 flex flex-col md:flex-row gap-6 shadow-sm relative items-center md:items-start text-center md:text-left cursor-pointer hover:scale-101 transition-transform min-h-56 pb-14 md:pb-16"
               >
-                <div className="w-14 h-14 md:w-20 md:h-20 bg-[#D9D9D9] rounded-full flex-shrink-0 mt-2 md:mt-0">
+                <div className="w-20 h-20 md:w-36 md:h-36 rounded-full bg-gray-300 overflow-hidden relative shadow-inner">
                   {isUrlValida(review.usuario.foto_perfil_url) ? (
                     <Image
                       src={review.usuario.foto_perfil_url!}
-                      alt="Logo da loja"
-                      width={48}
-                      height={48}
-                      className="w-full rounded-full h-full object-cover"
+                      alt={`Avatar de ${review.usuario.nome}`}
+                      fill
+                      className="object-cover"
                     />
-                  ) : null}
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-gray-400 text-white font-bold text-3xl">
+                      {review.usuario.nome?.charAt(0).toUpperCase()}
+                    </div>
+                  )}
                 </div>
 
-                <div className="ml-4 md:ml-[18px] flex flex-col flex-1">
-                  <h3 className="font-medium text-lg md:text-[22px] leading-tight mb-2 pr-20">
-                    {review.usuario.nome}
-                  </h3>
-
-                  <p className="font-light text-sm md:text-base text-justify text-gray-700 line-clamp-4">
+                <div className="flex-1 w-full text-left flex flex-col min-w-0">
+                  <div className="flex flex-col md:flex-row justify-between items-center md:items-start flex-wrap gap-2 w-full">
+                    <h3 className="font-normal text-lg md:text-3xl text-black leading-tight truncate">
+                      {review.usuario.nome}
+                    </h3>
+                    <div className="flex gap-1 text-[#FFEB3A] items-center">
+                      <ProductStars rating={review.nota} size={26} />
+                    </div>
+                  </div>
+                  <p className="font-extralight text-sm md:text-2xl text-black text-justify mt-4 leading-normal break-words line-clamp-3 md:line-clamp-4 pr-0 md:pr-4">
                     {review.comentario}
                   </p>
-                </div>
-
-                <div className="absolute top-5 right-5 md:top-6 md:right-6 scale-75 md:scale-100 origin-top-right">
-                  <ProductStars rating={review.nota} />
+                  <span className="absolute bottom-4 right-6 font-extralight text-sm md:text-2xl text-[#8A38F5] hover:underline transition-all">
+                    ver mais
+                  </span>
                 </div>
               </div>
             ))}
@@ -204,43 +414,77 @@ export default function ProductPage({ params }: ProductPageProps) {
         )}
       </section>
 
-      <section className="max-w-[1440px] mx-auto mt-[86px] px-8 lg:px-[123px]">
-        <h2 className="font-normal text-[40px] leading-[37px] mb-[40px]">
-          Da mesma loja
-        </h2>
+      <section className="max-w-7xl mx-auto mt-20 px-8 lg:px-28 w-full">
+        <div className="flex justify-between items-center w-full mb-10">
+          <h2 className="font-normal text-4xl leading-tight text-black">
+            Da mesma loja
+          </h2>
+          {filteredRelatedProducts.length > 2 && (
+            <div className="flex gap-2">
+              <button
+                onClick={handlePrevRelated}
+                disabled={relatedIndex === 0}
+                className={`w-10 h-10 rounded-full flex items-center justify-center border border-black/10 transition-all ${
+                  relatedIndex === 0
+                    ? "opacity-30 cursor-not-allowed bg-white/50 text-black/40"
+                    : "bg-white text-black hover:bg-purple-600 hover:text-white cursor-pointer active:scale-95 shadow-sm"
+                }`}
+              >
+                <ChevronLeft size={20} />
+              </button>
+              <button
+                onClick={handleNextRelated}
+                disabled={relatedIndex >= filteredRelatedProducts.length - 2}
+                className={`w-10 h-10 rounded-full flex items-center justify-center border border-black/10 transition-all ${
+                  relatedIndex >= filteredRelatedProducts.length - 2
+                    ? "opacity-30 cursor-not-allowed bg-white/50 text-black/40"
+                    : "bg-white text-black hover:bg-purple-600 hover:text-white cursor-pointer active:scale-95 shadow-sm"
+                }`}
+              >
+                <ChevronRight size={20} />
+              </button>
+            </div>
+          )}
+        </div>
 
-        {relatedProducts.length > 0 ? (
-          <div className="flex overflow-x-auto gap-[32px] pb-8 scrollbar-none">
-            {relatedProducts.map((product) => (
+        {filteredRelatedProducts.length > 0 ? (
+          <div className="flex gap-6 w-full justify-start">
+            {visibleRelated.map((product) => (
               <div
                 key={product.id}
-                className="min-w-[228px] h-[310px] bg-white rounded-[35px] relative p-5 flex flex-col flex-shrink-0"
+                className="w-56 h-80 bg-white rounded-3xl flex flex-col p-5 pt-5 shadow-sm hover:scale-101 transition-transform cursor-pointer text-left justify-between"
                 onClick={() => {
                   router.push(`/produto/${product.id}`);
                 }}
               >
-                <div className="absolute top-[16px] right-[16px] w-[68px] h-[68px] bg-gray-200 rounded-full z-10 overflow-hidden">
-                  {isUrlValida(product.loja.banner_url) ? (
+                <div className="relative w-full h-44 bg-gray-100 rounded-xl overflow-hidden">
+                  {product.imagens && product.imagens.length > 0 ? (
                     <Image
-                      src={product.loja.banner_url}
-                      alt="Logo da loja"
-                      width={68}
-                      height={68}
-                      className="w-full h-full object-cover"
+                      src={product.imagens[0].url_imagem}
+                      alt={`Imagem de ${product.nome || "Produto"}`}
+                      fill
+                      className="object-cover"
+                      unoptimized
                     />
-                  ) : null}{" "}
+                  ) : (
+                    <span className="text-gray-400 text-xs flex items-center justify-center h-full w-full">
+                      Foto do Produto
+                    </span>
+                  )}
                 </div>
-                <div className="w-[179px] h-[179px] bg-gray-100 rounded-[12px] mx-auto mt-[6px]"></div>
 
-                <div className="mt-auto pl-[2px] pb-[5px]">
-                  <h3 className="font-medium text-[26px] leading-[25px] truncate">
+                <div className="flex flex-col w-full flex-grow justify-end pb-1">
+                  <h3
+                    className="font-['League_Spartan'] font-medium text-2xl leading-tight text-black truncate w-full"
+                    title={product.nome}
+                  >
                     {product.nome}
                   </h3>
-                  <p className="font-medium text-[23px] leading-[21px] mt-[8px]">
-                    {product.preco}
+                  <p className="font-['League_Spartan'] font-medium text-xl leading-none text-black mt-1">
+                    {`R$ ${Number(product.preco).toFixed(2).replace(".", ",")}`}
                   </p>
                   <span
-                    className={`font-medium text-[13px] leading-[13px] mt-[8px] block ${
+                    className={`font-['League_Spartan'] font-medium block text-sm leading-none mt-1 ${
                       product.estoque > 0 ? "text-[#C6E700]" : "text-[#AF052A]"
                     }`}
                   >
@@ -256,6 +500,74 @@ export default function ProductPage({ params }: ProductPageProps) {
           </p>
         )}
       </section>
+
+      {isReviewModalOpen && (
+        <Modal onClose={() => setIsReviewModalOpen(false)}>
+          <form onSubmit={handleReviewSubmit} className="text-black font-sans w-80 md:w-96 h-auto pt-4 text-left">
+            <h2 className="text-xl text-center font-normal text-[#2D2D2D] mt-4 mb-4">
+              Você está avaliando{" "}
+              <span className="font-semibold">{productData.nome}</span>
+            </h2>
+
+            <div className="flex justify-center gap-2 mb-6">
+              {[1, 2, 3, 4, 5].map((star) => {
+                const devePreencher =
+                  hoverEstrelas !== null
+                    ? star <= hoverEstrelas
+                    : star <= newRating;
+
+                return (
+                  <svg
+                    key={star}
+                    onClick={() => setNewRating(star)}
+                    onMouseEnter={() => setHoverEstrelas(star)}
+                    onMouseLeave={() => setHoverEstrelas(null)}
+                    className={`w-10 h-10 text-[#A880FF] stroke-current stroke-1 cursor-pointer transition-colors ${
+                      devePreencher ? "fill-[#A880FF]" : "fill-none"
+                    }`}
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                  </svg>
+                );
+              })}
+            </div>
+
+            <textarea
+              className="w-full p-4 rounded-xl border border-neutral-200 text-neutral-700 bg-white focus:outline-none text-xs resize-none"
+              value={newComment}
+              onChange={(e) => setNewComment(e.target.value)}
+              placeholder="Escreva sua opinião sobre o produto..."
+              rows={6}
+              required
+            />
+
+            <div className="flex flex-col gap-3 mt-8 items-center w-full">
+              {reviews?.some((r) => r.usuario_id === currentUserId) && (
+                <button
+                  type="button"
+                  onClick={handleReviewDelete}
+                  className="w-11/12 bg-[#E53E2E] text-white py-2.5 rounded-full text-xs font-semibold uppercase tracking-wider cursor-pointer"
+                >
+                  Deletar
+                </button>
+              )}
+
+              <button
+                type="submit"
+                disabled={isSubmittingReview}
+                className="w-11/12 bg-[#633BFA] text-white py-2.5 rounded-full text-xs font-semibold uppercase tracking-wider disabled:opacity-50 cursor-pointer"
+              >
+                {isSubmittingReview
+                  ? "Enviando..."
+                  : reviews?.some((r) => r.usuario_id === currentUserId)
+                  ? "Salvar"
+                  : "Enviar"}
+              </button>
+            </div>
+          </form>
+        </Modal>
+      )}
     </div>
   );
 }

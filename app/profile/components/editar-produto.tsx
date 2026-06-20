@@ -71,11 +71,12 @@ export default function EditarProduto({
 
     imagensAtuais.forEach((img) => {
       if (img && !img.startsWith("blob:")) {
-        formData.append("imagens_mantidas", img);
+        formData.append("oldImg", img);
       }
     });
 
     try {
+      console.log(previewsSecundarias);
       await PatchEditProduct(produtoData.id, formData);
       onClose(false);
       router.refresh();
@@ -112,7 +113,6 @@ export default function EditarProduto({
           onSubmit={handleSave}
           className="w-full max-w-[826px] flex flex-col flex-1 min-h-0 justify-between gap-3"
         >
-          {/* SEÇÃO DE FOTOS ATUALIZADA */}
           <div className="flex flex-col gap-3 shrink-0">
             {/* FOTO PRINCIPAL */}
             <label className="w-full h-[15vh] max-h-[140px] border-2 border-dashed border-[#6A38F3] rounded-[10px] flex flex-col items-center justify-center cursor-pointer hover:bg-[#6A38F3]/5 transition-colors group relative overflow-hidden">
@@ -124,7 +124,6 @@ export default function EditarProduto({
                 onChange={handlePrincipalChange}
               />
 
-              {/* Se tiver imagem (do banco ou recém escolhida), mostra ela */}
               {previewPrincipal ? (
                 <>
                   <img
@@ -132,7 +131,6 @@ export default function EditarProduto({
                     alt="Foto Principal"
                     className="w-full h-full object-cover"
                   />
-                  {/* Overlay escura que aparece quando passa o mouse pra indicar que pode trocar */}
                   <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                     <Camera color="white" size={40} />
                   </div>
