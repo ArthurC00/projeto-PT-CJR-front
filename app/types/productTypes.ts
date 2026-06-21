@@ -12,6 +12,8 @@ export interface ProductCategoria {
 }
 
 export interface ProductLoja {
+  id: number;
+  nome: string;  
   usuario_id: number;
   banner_url: string;
 }

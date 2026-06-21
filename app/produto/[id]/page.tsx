@@ -17,6 +17,7 @@ import ProductImages from "../ProductImages";
 import OwnerActions from "@/components/ownerActions";
 import { ProductResponse, ReviewProduct } from "@/app/types/productTypes";
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { decodeUserToken } from "@/app/utils/auth";
 import Modal from "@/components/modal";
@@ -313,6 +314,13 @@ export default function ProductPage({ params }: ProductPageProps) {
             />
           </div>
 
+           <Link
+              href={`/loja/${productData.loja.id}`}
+              className="text-[#6A38F3] font-medium text-lg hover:bg-purple-700 mt-1 w-fit px-10 py-1 bg-blue-500 text-white rounded-full hover:scale-102 active:scale-99 transition-all duration-300"
+              >
+              {productData.loja.nome}
+            </Link>
+
           <div className="flex items-center gap-7 mt-6 whitespace-nowrap">
             {totalReviews > 0 ? (
               <div className="flex items-center gap-1">
@@ -368,6 +376,8 @@ export default function ProductPage({ params }: ProductPageProps) {
             </p>
           </div>
         </div>
+
+
       </main>
 
       <section className="max-w-7xl mx-auto mt-16 md:mt-28 px-4 md:px-8 lg:px-28 w-full">
