@@ -33,6 +33,7 @@ export default function ProfilePage({ userId }: ProfilePageProps) {
   const [reviews, setReviews] = useState<LojaReviewResponse[]>([]);
   const [reviewIndex, setReviewIndex] = useState(0);
   const [lojaIndex, setLojaIndex] = useState(0);
+  const [productIndex, setProductIndex] = useState(0);
   const [openEditarPerfil, setOpenEditarPerfil] = useState(false);
   const [pageNotFound, setPageNotFound] = useState(false);
   const [countdown, setCountdown] = useState(3);
@@ -127,6 +128,19 @@ export default function ProfilePage({ userId }: ProfilePageProps) {
     }
   };
 
+  const handleNextProduct = () => {
+    const maxIndex = Math.max(0, userProducts.length - 5);
+    if (productIndex < maxIndex) {
+      setProductIndex((prev) => prev + 1);
+    }
+  };
+
+  const handlePrevProduct = () => {
+    if (productIndex > 0) {
+      setProductIndex((prev) => prev - 1);
+    }
+  };
+
   if (pageNotFound) {
     return (
       <div className="min-h-screen bg-[#F6F3E4] text-black overflow-y-auto pb-20 flex flex-col items-center justify-center">
@@ -145,6 +159,7 @@ export default function ProfilePage({ userId }: ProfilePageProps) {
   const visibleLojas = minhasLojas
     ? minhasLojas.slice(lojaIndex, lojaIndex + 2)
     : [];
+  const visibleProducts = userProducts.slice(productIndex, productIndex + 5);
 
   return (
     <div className="z-0 min-h-screen bg-[#F6F3E4] text-black overflow-y-auto pb-20">
@@ -208,29 +223,45 @@ export default function ProfilePage({ userId }: ProfilePageProps) {
 
         <div className="z-10 flex flex-col gap-[40px] md:gap-[60px]">
           {userProducts && userProducts.length > 0 && (
-            <section>
-              <h2 className="text-2xl md:text-[36px] font-medium text-black mb-6">
-                Produtos
-              </h2>
+            <section className="w-full">
+              <div className="flex justify-between items-center mb-6 w-full">
+                <h2 className="text-2xl md:text-[36px] font-medium text-black">
+                  Produtos
+                </h2>
+                {userProducts.length > 5 && (
+                  <div className="flex gap-2">
+                    <button
+                      onClick={handlePrevProduct}
+                      disabled={productIndex === 0}
+                      className={`w-10 h-10 rounded-full flex items-center justify-center border border-black/10 transition-all ${
+                        productIndex === 0
+                          ? "opacity-30 cursor-not-allowed bg-white/50 text-black/40"
+                          : "bg-white text-black hover:bg-purple-600 hover:text-white cursor-pointer active:scale-95 shadow-sm"
+                      }`}
+                    >
+                      <ChevronLeft size={20} />
+                    </button>
+                    <button
+                      onClick={handleNextProduct}
+                      disabled={productIndex >= userProducts.length - 5}
+                      className={`w-10 h-10 rounded-full flex items-center justify-center border border-black/10 transition-all ${
+                        productIndex >= userProducts.length - 5
+                          ? "opacity-30 cursor-not-allowed bg-white/50 text-black/40"
+                          : "bg-white text-black hover:bg-purple-600 hover:text-white cursor-pointer active:scale-95 shadow-sm"
+                      }`}
+                    >
+                      <ChevronRight size={20} />
+                    </button>
+                  </div>
+                )}
+              </div>
               <div className="flex gap-6 md:gap-8 p-2 overflow-x-auto scroll-smooth [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:display-none [&::-webkit-scrollbar]:hidden">
-                {userProducts.map((product) => (
+                {visibleProducts.map((product) => (
                   <div
                     key={product.id}
                     className="w-[228px] h-[310px] bg-white rounded-[35px] p-5 flex flex-col justify-between flex-shrink-0 shadow-sm relative hover:scale-101 cursor-pointer"
                     onClick={() => router.push(`/produto/${product.id}`)}
                   >
-                    <div className="absolute top-4 right-4 w-8 h-8 rounded-full bg-gray-200 overflow-hidden">
-                      {product.loja?.banner_url ? (
-                        <Image
-                          src={product.loja.banner_url}
-                          alt="Banner da Loja"
-                          fill
-                          className="object-cover"
-                          unoptimized
-                        />
-                      ) : null}
-                    </div>
-
                     <div className="relative w-full h-[150px] bg-gray-100 rounded-[12px] flex items-center justify-center overflow-hidden shrink-0">
                       {product.imagens && product.imagens.length > 0 ? (
                         <Image
@@ -245,6 +276,18 @@ export default function ProfilePage({ userId }: ProfilePageProps) {
                           Foto do Produto
                         </span>
                       )}
+                    </div>
+
+                    <div className="absolute top-4 right-4 w-8 h-8 rounded-full bg-gray-200 overflow-hidden z-10">
+                      {product.loja?.banner_url ? (
+                        <Image
+                          src={product.loja.banner_url}
+                          alt="Banner da Loja"
+                          fill
+                          className="object-cover"
+                          unoptimized
+                        />
+                      ) : null}
                     </div>
 
                     <div className="mt-2 text-left">

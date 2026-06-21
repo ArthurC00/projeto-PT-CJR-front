@@ -1,7 +1,7 @@
 "use client";
 
 import Navbar from "@/components/navbar";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import Modal from "@/components/modal";
@@ -25,7 +25,7 @@ import {
 import Image from "next/image";
 import editReviewCommentSVG from "../../public/editReviewComment.svg";
 
-export default function com_aval() {
+function ComAvalContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -445,5 +445,13 @@ export default function com_aval() {
         </Modal>
       )}
     </div>
+  );
+}
+
+export default function com_aval() {
+  return (
+    <Suspense fallback={<div>Carregando...</div>}>
+      <ComAvalContent />
+    </Suspense>
   );
 }

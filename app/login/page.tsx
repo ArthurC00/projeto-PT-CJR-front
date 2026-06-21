@@ -1,6 +1,6 @@
 // coisas da integração
 "use client";
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
 
@@ -10,7 +10,7 @@ import Image from "next/image";
 import { postLogin } from "../services/api";
 import { decodeUserToken } from "../utils/auth";
 
-export default function Login() {
+function LoginContent() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -136,5 +136,13 @@ export default function Login() {
         </form>
       </div>
     </main>
+  );
+}
+
+export default function Login() {
+  return (
+    <Suspense fallback={<div>Carregando...</div>}>
+      <LoginContent />
+    </Suspense>
   );
 }

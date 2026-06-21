@@ -150,3 +150,15 @@ export const deleteReviewCommentById = async (id: number): Promise<void> => {
     };
   }
 };
+
+export const getAllLojas = async (): Promise<LojaUsuarioResponse[]> => {
+  try {
+    const response = await api.get(`/lojas`);
+    return response.data;
+  } catch (e: any) {
+    throw {
+      status: e.response?.status,
+      message: e.response?.data?.message || e.message,
+    };
+  }
+};

@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export const api = axios.create({
-  baseURL: "http://localhost:3001",
+  baseURL: "http://localhost:3001" || process.env.NEXT_PUBLIC_API_URL,
 });
 
 interface Login {
@@ -167,12 +167,28 @@ export const getCategoriaComProdutos = async (
   id: string,
 ): Promise<CategoriaDetalhe> => {
   try {
-    const response = await axios.get(
-      `http://127.0.0.1:3001/categorias/${id}/produtos`,
-    );
+    const response = await api.get(`/categorias/${id}/produtos`);
     return response.data;
   } catch (error: any) {
     console.log("erro:", error.response?.data);
     throw new Error(error.message);
+  }
+};
+
+export const uploadUserFoto = async (userId: number, file: File) => {
+  try {
+    const token = localStorage.getItem("token");
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const response = await api.patch(`/usuarios/${userId}/foto`, formData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    return response.data;
+  } catch (e: any) {
+    throw new Error(e.response?.data?.message || e.message);
   }
 };

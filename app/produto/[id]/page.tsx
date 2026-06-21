@@ -373,13 +373,14 @@ export default function ProductPage({ params }: ProductPageProps) {
                 onClick={() => router.push(`/com_aval?id=${review.id}`)}
                 className="w-full bg-white rounded-3xl p-6 md:p-8 flex flex-col md:flex-row gap-6 shadow-sm relative items-center md:items-start text-center md:text-left cursor-pointer hover:scale-101 transition-transform min-h-56 pb-14 md:pb-16"
               >
-                <div className="w-20 h-20 md:w-36 md:h-36 rounded-full bg-gray-300 overflow-hidden relative shadow-inner">
+                <div className="w-20 h-20 md:w-32 md:h-32 rounded-full bg-gray-300 overflow-hidden relative shadow-inner">
                   {isUrlValida(review.usuario.foto_perfil_url) ? (
                     <Image
                       src={review.usuario.foto_perfil_url!}
                       alt={`Avatar de ${review.usuario.nome}`}
                       fill
                       className="object-cover"
+                      unoptimized
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center bg-gray-400 text-white font-bold text-3xl">
@@ -390,19 +391,18 @@ export default function ProductPage({ params }: ProductPageProps) {
 
                 <div className="flex-1 w-full text-left flex flex-col min-w-0">
                   <div className="flex flex-col md:flex-row justify-between items-center md:items-start flex-wrap gap-2 w-full">
-                    <h3 className="font-normal text-lg md:text-3xl text-black leading-tight truncate">
-                      {review.usuario.nome}
-                    </h3>
+                    <div className="flex flex-col min-w-0 w-full md:w-auto">
+                      <h4 className="font-normal text-lg md:text-3xl text-black leading-tight truncate">
+                        {review.usuario.nome}
+                      </h4>
+                    </div>
                     <div className="flex gap-1 text-[#FFEB3A] items-center">
-                      <ProductStars rating={review.nota} size={26} />
+                      <ProductStars rating={review.nota} size={34} />
                     </div>
                   </div>
-                  <p className="font-extralight text-sm md:text-2xl text-black text-justify mt-4 leading-normal break-words line-clamp-3 md:line-clamp-4 pr-0 md:pr-4">
+                  <p className="font-extralight text-sm md:text-xl text-black text-justify mt-4 leading-relaxed break-words line-clamp-3 md:line-clamp-4 pr-0 md:pr-4">
                     {review.comentario}
                   </p>
-                  <span className="absolute bottom-4 right-6 font-extralight text-sm md:text-2xl text-[#8A38F5] hover:underline transition-all">
-                    ver mais
-                  </span>
                 </div>
               </div>
             ))}
@@ -452,12 +452,12 @@ export default function ProductPage({ params }: ProductPageProps) {
             {visibleRelated.map((product) => (
               <div
                 key={product.id}
-                className="w-56 h-80 bg-white rounded-3xl flex flex-col p-5 pt-5 shadow-sm hover:scale-101 transition-transform cursor-pointer text-left justify-between"
+                className="w-56 h-[310px] bg-white rounded-[35px] p-5 flex flex-col justify-between flex-shrink-0 shadow-sm relative hover:scale-101 cursor-pointer"
                 onClick={() => {
                   router.push(`/produto/${product.id}`);
                 }}
               >
-                <div className="relative w-full h-44 bg-gray-100 rounded-xl overflow-hidden">
+                <div className="relative w-full h-[150px] bg-gray-100 rounded-[12px] flex items-center justify-center overflow-hidden">
                   {product.imagens && product.imagens.length > 0 ? (
                     <Image
                       src={product.imagens[0].url_imagem}
@@ -467,25 +467,39 @@ export default function ProductPage({ params }: ProductPageProps) {
                       unoptimized
                     />
                   ) : (
-                    <span className="text-gray-400 text-xs flex items-center justify-center h-full w-full">
+                    <span className="text-gray-400 text-xs">
                       Foto do Produto
                     </span>
                   )}
                 </div>
 
-                <div className="flex flex-col w-full flex-grow justify-end pb-1">
-                  <h3
-                    className="font-['League_Spartan'] font-medium text-2xl leading-tight text-black truncate w-full"
+                <div className="absolute top-4 right-4 w-8 h-8 rounded-full bg-gray-200 overflow-hidden z-10">
+                  {product.loja?.banner_url ? (
+                    <Image
+                      src={product.loja.banner_url}
+                      alt="Banner da Loja"
+                      fill
+                      className="object-cover"
+                      unoptimized
+                    />
+                  ) : null}
+                </div>
+
+                <div className="mt-2 text-left">
+                  <h4
+                    className="text-2xl font-medium text-black truncate leading-tight"
                     title={product.nome}
                   >
                     {product.nome}
-                  </h3>
-                  <p className="font-['League_Spartan'] font-medium text-xl leading-none text-black mt-1">
+                  </h4>
+                  <p className="text-xl font-medium text-black mt-1">
                     {`R$ ${Number(product.preco).toFixed(2).replace(".", ",")}`}
                   </p>
                   <span
-                    className={`font-['League_Spartan'] font-medium block text-sm leading-none mt-1 ${
-                      product.estoque > 0 ? "text-[#C6E700]" : "text-[#AF052A]"
+                    className={`text-sm font-medium block mt-1 ${
+                      product.estoque > 0
+                        ? "text-[#C6E700]"
+                        : "text-[#AF052A]"
                     }`}
                   >
                     {product.estoque > 0 ? "DISPONÍVEL" : "INDISPONÍVEL"}

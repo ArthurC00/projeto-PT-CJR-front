@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
+import { api } from "@/app/services/api";
 
 interface Produto {
   id: number;
@@ -20,9 +21,9 @@ export function useProductSearch(query: string) {
 
     const timer = setTimeout(() => {
       setLoading(true);
-      fetch(`http://localhost:3001/produtos?q=${encodeURIComponent(query)}`)
-        .then((res) => res.json())
-        .then((data) => setResults(data))
+      api.get(`/produtos?q=${encodeURIComponent(query)}`)
+        .then((res) => setResults(res.data))
+        .catch((err) => console.error("Search error:", err))
         .finally(() => setLoading(false));
     }, 400);
 
