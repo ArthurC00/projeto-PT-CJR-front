@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || "https://ptcjr.onrender.com",
+  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001",
 });
 
 interface Login {
@@ -49,6 +49,7 @@ export interface Produto {
 export interface Categoria {
   id: number;
   nome: string;
+  categoria_pai_id?: number | null;
 }
 
 export interface CategoriaDetalhe {

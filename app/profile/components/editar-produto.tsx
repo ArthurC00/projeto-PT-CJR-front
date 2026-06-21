@@ -2,9 +2,10 @@
 
 import Modal from "@/components/modal";
 import { Camera, Plus, Minus, ChevronDown } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { DeleteProduct, PatchEditProduct } from "@/app/services/productApi";
+import { getCategorias, Categoria } from "@/app/services/api";
 
 interface EditarProdutoProps {
   onClose: (deleted?: boolean) => void;
@@ -26,11 +27,22 @@ export default function EditarProduto({
 }: EditarProdutoProps) {
   const router = useRouter();
   const [quantidade, setQuantidade] = useState(produtoData.estoque || 1);
+  const [categorias, setCategorias] = useState<Categoria[]>([]);
 
-  // 1. Extraímos as URLs das imagens que já vieram do banco de dados
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const cats = await getCategorias();
+        setCategorias(cats || []);
+      } catch (e) {
+        console.error(e);
+      }
+    };
+    loadCategories();
+  }, []);
+
   const imagensAtuais = produtoData.imagens?.map((img) => img.url_imagem) || [];
 
-  // 2. Criamos os estados para as imagens. Posição 0 é a principal. 1, 2 e 3 são as secundárias.
   const [previewPrincipal, setPreviewPrincipal] = useState<string | null>(
     imagensAtuais[0] || null,
   );
@@ -42,7 +54,6 @@ export default function EditarProduto({
     imagensAtuais[3] || null,
   ]);
 
-  // 3. Funções para ler o arquivo do computador e mostrar a foto nova na hora
   const handlePrincipalChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -209,9 +220,13 @@ export default function EditarProduto({
                 <option value="" disabled>
                   Subcategoria
                 </option>
-                <option value="1">Doces</option>
-                <option value="2">Bebidas</option>
-                <option value="3">Salgados</option>
+                {categorias
+                  .filter((cat) => cat.categoria_pai_id !== null)
+                  .map((cat) => (
+                    <option key={cat.id} value={cat.id}>
+                      {cat.nome}
+                    </option>
+                  ))}
               </select>
               <ChevronDown
                 className="absolute right-6 top-1/2 -translate-y-1/2 text-black pointer-events-none"
@@ -231,7 +246,7 @@ export default function EditarProduto({
               type="number"
               step="0.01"
               placeholder="Preço do produto"
-              defaultValue={produtoData.preco}
+              defaultValue={Number(produtoData.preco)}
               className="w-full shrink-0 h-[45px] md:h-[55px] bg-white rounded-full px-6 text-[20px] font-light text-black placeholder:text-black/50 outline-none focus:ring-2 focus:ring-[#6A38F3]"
               required
             />

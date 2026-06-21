@@ -17,9 +17,11 @@ export default function AlterarSenha({
   const [showSenhaAntiga, setShowSenhaAntiga] = useState(false);
   const [showNovaSenha, setShowNovaSenha] = useState(false);
   const [showConfirmarSenha, setShowConfirmarSenha] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   const handleSaveSenha = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSaving) return;
 
     if (novaSenha !== confirmarSenha) {
       alert("A nova senha e a confirmação não coincidem");
@@ -32,6 +34,7 @@ export default function AlterarSenha({
     }
 
     try {
+      setIsSaving(true);
       await updatePassword(userData.id, {
         senha_atual: senhaAntiga,
         nova_senha: novaSenha,
@@ -39,6 +42,8 @@ export default function AlterarSenha({
       onClose();
     } catch (error: any) {
       alert(error.response?.data?.message || "Ocorreu um erro ao salvar.");
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -139,9 +144,10 @@ export default function AlterarSenha({
           <button
             form="alterar-senha"
             type="submit"
-            className="rounded-full my-1 h-10 w-3/4 outline-4 -outline-offset-2 outline-[#6A38F3] bg-[#6A38F3] text-white shadow-md hover:scale-102 transition"
+            disabled={isSaving}
+            className="rounded-full my-1 h-10 w-3/4 outline-4 -outline-offset-2 outline-[#6A38F3] bg-[#6A38F3] text-white shadow-md hover:scale-102 transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Salvar Senha
+            {isSaving ? "Salvando..." : "Salvar Senha"}
           </button>
         </div>
       </div>

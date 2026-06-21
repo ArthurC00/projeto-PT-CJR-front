@@ -2,7 +2,8 @@ import { PostCreateProduct } from "@/app/services/productApi";
 import { LojaDetalhesResponse } from "@/app/types/lojaTypes";
 import Modal from "@/components/modal";
 import { Camera, Plus, Minus, ChevronDown } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { getCategorias, Categoria } from "@/app/services/api";
 
 interface AdicionarProdutoProps {
   onClose: () => void;
@@ -18,6 +19,19 @@ export default function AdicionarProduto({
   loja,
 }: AdicionarProdutoProps) {
   const [quantidade, setQuantidade] = useState(1);
+  const [categorias, setCategorias] = useState<Categoria[]>([]);
+
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const cats = await getCategorias();
+        setCategorias(cats || []);
+      } catch (e) {
+        console.error(e);
+      }
+    };
+    loadCategories();
+  }, []);
 
   const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -112,9 +126,13 @@ export default function AdicionarProduto({
                 <option value="" disabled>
                   Subcategoria
                 </option>
-                <option value="2">Doces</option>
-                <option value="2">Bebidas</option>
-                <option value="2">Salgados</option>
+                {categorias
+                  .filter((cat) => cat.categoria_pai_id !== null)
+                  .map((cat) => (
+                    <option key={cat.id} value={cat.id}>
+                      {cat.nome}
+                    </option>
+                  ))}
               </select>
               <ChevronDown
                 className="absolute right-6 top-1/2 -translate-y-1/2 text-black pointer-events-none"
