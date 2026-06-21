@@ -8,6 +8,7 @@ import {
   postProductReview,
   updateProductReview,
   deleteProductReview,
+  PatchEditProduct,
 } from "@/app/services/productApi";
 import Navbar from "@/components/navbar";
 import ProductStars from "@/components/productStart";
@@ -48,6 +49,7 @@ export default function ProductPage({ params }: ProductPageProps) {
   const [newComment, setNewComment] = useState("");
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
   const [hoverEstrelas, setHoverEstrelas] = useState<number | null>(null);
+  const [isBuying, setIsBuying] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -166,6 +168,34 @@ export default function ProductPage({ params }: ProductPageProps) {
     }
   };
 
+  const handleBuyProduct = async () => {
+    if (!productData || productData.estoque <= 0 || isBuying) return;
+
+    try {
+      setIsBuying(true);
+      const novoEstoque = productData.estoque - 1;
+
+      await PatchEditProduct(productData.id, {
+        estoque: novoEstoque,
+      });
+
+      setProductData((prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          estoque: novoEstoque,
+        };
+      });
+
+      alert("Compra realizada com sucesso!");
+    } catch (err: any) {
+      console.error(err);
+      alert(err.message || "Erro ao realizar a compra.");
+    } finally {
+      setIsBuying(false);
+    }
+  };
+
   useEffect(() => {
     fetchPageData();
   }, [id]);
@@ -224,7 +254,7 @@ export default function ProductPage({ params }: ProductPageProps) {
     : [];
   const visibleRelated = filteredRelatedProducts.slice(
     relatedIndex,
-    relatedIndex + 2,
+    relatedIndex + 4,
   );
 
   if (isLoading) {
@@ -300,14 +330,34 @@ export default function ProductPage({ params }: ProductPageProps) {
             <span className="font-light text-lg leading-none text-[#6A38F3]">
               {productData.categoria?.nome || ""}
             </span>
-            <span className="font-light text-lg leading-none text-[#6A38F3]">
-              {productData.estoque} disponíveis
+            <span
+              className={`font-light text-lg leading-none ${productData.estoque > 0 ? "text-[#6A38F3]" : "text-[#AF052A]"}`}
+            >
+              {productData.estoque > 0
+                ? `${productData.estoque} disponíveis`
+                : "Indisponível"}
             </span>
           </div>
 
           <h2 className="font-normal text-4xl leading-tight mt-4">
             R$ {Number(productData.preco).toFixed(2).replace(".", ",")}
           </h2>
+
+          <button
+            onClick={handleBuyProduct}
+            disabled={productData.estoque <= 0 || isBuying}
+            className={`w-full py-3 mt-6 rounded-full font-bold uppercase tracking-wider transition-all duration-300 ${
+              productData.estoque > 0 && !isBuying
+                ? "bg-[#6A38F3] text-white hover:bg-purple-700 hover:scale-101 active:scale-99 cursor-pointer shadow-md"
+                : "bg-gray-300 text-gray-500 cursor-not-allowed"
+            }`}
+          >
+            {isBuying
+              ? "Comprando..."
+              : productData.estoque > 0
+                ? "Comprar"
+                : "Indisponível"}
+          </button>
 
           <div className="mt-7">
             <h3 className="font-normal text-xl leading-none">Descrição</h3>
@@ -419,7 +469,7 @@ export default function ProductPage({ params }: ProductPageProps) {
           <h2 className="font-normal text-4xl leading-tight text-black">
             Da mesma loja
           </h2>
-          {filteredRelatedProducts.length > 2 && (
+          {filteredRelatedProducts.length > 4 && (
             <div className="flex gap-2">
               <button
                 onClick={handlePrevRelated}
@@ -434,9 +484,9 @@ export default function ProductPage({ params }: ProductPageProps) {
               </button>
               <button
                 onClick={handleNextRelated}
-                disabled={relatedIndex >= filteredRelatedProducts.length - 2}
+                disabled={relatedIndex >= filteredRelatedProducts.length - 4}
                 className={`w-10 h-10 rounded-full flex items-center justify-center border border-black/10 transition-all ${
-                  relatedIndex >= filteredRelatedProducts.length - 2
+                  relatedIndex >= filteredRelatedProducts.length - 4
                     ? "opacity-30 cursor-not-allowed bg-white/50 text-black/40"
                     : "bg-white text-black hover:bg-purple-600 hover:text-white cursor-pointer active:scale-95 shadow-sm"
                 }`}
@@ -448,7 +498,7 @@ export default function ProductPage({ params }: ProductPageProps) {
         </div>
 
         {filteredRelatedProducts.length > 0 ? (
-          <div className="flex gap-6 w-full justify-start">
+          <div className="flex gap-8 w-full justify-center">
             {visibleRelated.map((product) => (
               <div
                 key={product.id}
@@ -497,9 +547,7 @@ export default function ProductPage({ params }: ProductPageProps) {
                   </p>
                   <span
                     className={`text-sm font-medium block mt-1 ${
-                      product.estoque > 0
-                        ? "text-[#C6E700]"
-                        : "text-[#AF052A]"
+                      product.estoque > 0 ? "text-[#C6E700]" : "text-[#AF052A]"
                     }`}
                   >
                     {product.estoque > 0 ? "DISPONÍVEL" : "INDISPONÍVEL"}
@@ -517,7 +565,10 @@ export default function ProductPage({ params }: ProductPageProps) {
 
       {isReviewModalOpen && (
         <Modal onClose={() => setIsReviewModalOpen(false)}>
-          <form onSubmit={handleReviewSubmit} className="text-black font-sans w-80 md:w-96 h-auto pt-4 text-left">
+          <form
+            onSubmit={handleReviewSubmit}
+            className="text-black font-sans w-80 md:w-96 h-auto pt-4 text-left"
+          >
             <h2 className="text-xl text-center font-normal text-[#2D2D2D] mt-4 mb-4">
               Você está avaliando{" "}
               <span className="font-semibold">{productData.nome}</span>
@@ -575,8 +626,8 @@ export default function ProductPage({ params }: ProductPageProps) {
                 {isSubmittingReview
                   ? "Enviando..."
                   : reviews?.some((r) => r.usuario_id === currentUserId)
-                  ? "Salvar"
-                  : "Enviar"}
+                    ? "Salvar"
+                    : "Enviar"}
               </button>
             </div>
           </form>

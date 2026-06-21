@@ -15,6 +15,7 @@ export default function EditarPerfil({
   const [openAlterarSenha, setOpenAlterarSenha] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -26,9 +27,11 @@ export default function EditarPerfil({
 
   const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (isSaving) return;
     const formElement = e.currentTarget;
 
     try {
+      setIsSaving(true);
       let uploadedUrl = userData.foto_perfil_url;
 
       if (selectedFile) {
@@ -52,6 +55,8 @@ export default function EditarPerfil({
     } catch (err: any) {
       console.error(err);
       alert(err.message || "Erro ao salvar perfil.");
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -136,9 +141,10 @@ export default function EditarPerfil({
           <button
             form="editar-perfil"
             type="submit"
-            className="rounded-full my-1 h-10 w-3/4 outline-4 -outline-offset-2 outline-[#6A38F3] bg-[#6A38F3] text-white shadow-md hover:scale-102 transition"
+            disabled={isSaving}
+            className="rounded-full my-1 h-10 w-3/4 outline-4 -outline-offset-2 outline-[#6A38F3] bg-[#6A38F3] text-white shadow-md hover:scale-102 transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Salvar
+            {isSaving ? "Salvando..." : "Salvar"}
           </button>
         </div>
       </div>

@@ -49,6 +49,7 @@ export interface Produto {
 export interface Categoria {
   id: number;
   nome: string;
+  categoria_pai_id?: number | null;
 }
 
 export interface CategoriaDetalhe {
