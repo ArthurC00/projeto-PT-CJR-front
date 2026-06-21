@@ -1,6 +1,6 @@
 import { PostCreateProduct } from "@/app/services/productApi";
+import { LojaDetalhesResponse } from "@/app/types/lojaTypes";
 import Modal from "@/components/modal";
-import { error } from "console";
 import { Camera, Plus, Minus, ChevronDown } from "lucide-react";
 import { useState } from "react";
 
@@ -8,14 +8,14 @@ interface AdicionarProdutoProps {
   onClose: () => void;
   height?: string;
   width?: string;
-  loja_id?: string;
+  loja: LojaDetalhesResponse;
 }
 
 export default function AdicionarProduto({
   onClose,
   height = "90vh",
-  width = "90vw",
-  loja_id = "2",
+  width = "40vw",
+  loja,
 }: AdicionarProdutoProps) {
   const [quantidade, setQuantidade] = useState(1);
 
@@ -26,8 +26,8 @@ export default function AdicionarProduto({
 
     formData.append("estoque", quantidade.toString());
 
-    if (!loja_id) throw new Error("Id não encontrado");
-    formData.append("loja_id", loja_id);
+    if (!loja?.id) throw new Error("Id não encontrado");
+    formData.append("loja_id", String(loja.id));
 
     try {
       const result = await PostCreateProduct(formData);

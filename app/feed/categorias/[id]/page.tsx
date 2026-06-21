@@ -15,6 +15,7 @@ export default async function CategoriaPage({
   const categoria: CategoriaDetalhe = await getCategoriaComProdutos(id)
 
   // pega o id da subcategoria selecionada da URL (para filtrar)
+  
   return (
     <div className="min-h-screen min-w-screen overflow-x-hidden">
       {/* banner */}
@@ -45,11 +46,11 @@ export default async function CategoriaPage({
       </div>
 
       {/* subcategorias + ordenar */}
-      <div className="justify-items-center grid grid-cols-2 gap-0.1 mt-5 ml-16">
-        <div className="justify-items-center justify-between flex flex-wrap gap-3 mt-5">
+      <div className="grid grid-cols-2 gap-0.1 mt-5 ml-16">
+        <div className=" flex flex-wrap gap-3 mt-5">
           {/* link "Todos" para mostrar todos os produtos */}
           <Link
-            href={`/feed/categorias/${categoria.id}`}
+            href={`/feed/categorias/${categoria.categoria_pai_id ?? categoria.id}`}
             className="bg-white px-5 py-2 rounded-full text-2xl text-blue-400 hover:bg-blue-50 transition-colors"
           >
             Todos

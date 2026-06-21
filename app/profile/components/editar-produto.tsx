@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { DeleteProduct, PatchEditProduct } from "@/app/services/productApi";
 
 interface EditarProdutoProps {
-  onClose: () => void;
+  onClose: (deleted?: boolean) => void;
   produtoData: {
     id: number;
     nome: string;
@@ -71,13 +71,14 @@ export default function EditarProduto({
 
     imagensAtuais.forEach((img) => {
       if (img && !img.startsWith("blob:")) {
-        formData.append("imagens_mantidas", img);
+        formData.append("oldImg", img);
       }
     });
 
     try {
+      console.log(previewsSecundarias);
       await PatchEditProduct(produtoData.id, formData);
-      onClose();
+      onClose(false);
       router.refresh();
     } catch (error: any) {
       console.error("Erro ao editar produto:", error);
@@ -92,15 +93,16 @@ export default function EditarProduto({
 
     try {
       await DeleteProduct(produtoData.id);
-      onClose();
-      router.push("/");
+      onClose(true);
+      router.push("/feed");
+      router.refresh();
     } catch (error: any) {
       console.error("Erro ao deletar produto:", error);
     }
   };
 
   return (
-    <Modal onClose={onClose} height="90vh" width="min(1020px, 90vw)">
+    <Modal onClose={onClose} height="90vh" width="min(1020px, 40vw)">
       <div className="w-full h-full flex flex-col items-center font-['League_Spartan'] text-black py-2">
         <h1 className="text-[32px] md:text-[42px] leading-tight font-normal mb-2 text-center shrink-0">
           Editar Produto
@@ -111,7 +113,6 @@ export default function EditarProduto({
           onSubmit={handleSave}
           className="w-full max-w-[826px] flex flex-col flex-1 min-h-0 justify-between gap-3"
         >
-          {/* SEÇÃO DE FOTOS ATUALIZADA */}
           <div className="flex flex-col gap-3 shrink-0">
             {/* FOTO PRINCIPAL */}
             <label className="w-full h-[15vh] max-h-[140px] border-2 border-dashed border-[#6A38F3] rounded-[10px] flex flex-col items-center justify-center cursor-pointer hover:bg-[#6A38F3]/5 transition-colors group relative overflow-hidden">
@@ -123,7 +124,6 @@ export default function EditarProduto({
                 onChange={handlePrincipalChange}
               />
 
-              {/* Se tiver imagem (do banco ou recém escolhida), mostra ela */}
               {previewPrincipal ? (
                 <>
                   <img
@@ -131,7 +131,6 @@ export default function EditarProduto({
                     alt="Foto Principal"
                     className="w-full h-full object-cover"
                   />
-                  {/* Overlay escura que aparece quando passa o mouse pra indicar que pode trocar */}
                   <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                     <Camera color="white" size={40} />
                   </div>

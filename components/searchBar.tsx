@@ -1,4 +1,5 @@
-import { useState, useCallback, useEffect } from 'react'; 
+import { useState, useCallback, useEffect } from "react";
+import { api } from "@/app/services/api";
 
 interface Produto {
   id: number;
@@ -7,7 +8,6 @@ interface Produto {
   descricao: string;
   estoque: number;
 }
-
 
 export function useProductSearch(query: string) {
   const [results, setResults] = useState<Produto[]>([]);
@@ -21,9 +21,9 @@ export function useProductSearch(query: string) {
 
     const timer = setTimeout(() => {
       setLoading(true);
-      fetch(`http://localhost:3001/produtos?q=${encodeURIComponent(query)}`)
-        .then(res => res.json())
-        .then(data => setResults(data))
+      api.get(`/produtos?q=${encodeURIComponent(query)}`)
+        .then((res) => setResults(res.data))
+        .catch((err) => console.error("Search error:", err))
         .finally(() => setLoading(false));
     }, 400);
 
@@ -31,38 +31,50 @@ export function useProductSearch(query: string) {
   }, [query]);
 
   return { results, loading };
-} 
-
+}
 
 export function BarraDePesquisa() {
-    const [ input, setInput ] = useState('');
-    const { results, loading } = useProductSearch(input);
+  const [input, setInput] = useState("");
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false); // Controla se a lista deve aparecer
 
-    return (
-     <div className="justify-items-between justify-center relative">
-        <input
-          type="search"
-          placeholder="procure aqui"
-          value = { input }
-          onChange={(e) => setInput(e.target.value)}
-          className=" relative h-10 mt-5 ml-300 bg-white  w-150 px-4 rounded-full py-2 text-gray-700 focus:outline-none"
-        />
-        {(loading || results.length > 0) && (
-            <ul className ="absolute bg-white border border-gray-200 rounded-xl shadow-lg mt-1 w-150 ml-300 z-50">
-                {loading && (
-                    <li className="px-4 py-2 text-gray-400 text-sm">Buscando...</li>
-                )}
-                {results.map((produto) => (
-                     <li
-              key={produto.id}
-              className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-gray-700 text-sm"
-              onClick={() => {
-                setInput(produto.nome);
-               }}
-            >
-              {produto.nome}
+  const { results, loading } = useProductSearch(input);
+
+  useEffect(() => {
+    if (!input.trim()) setIsDropdownOpen(false);
+    else setIsDropdownOpen(true);
+  }, [input]);
+
+  return (
+    <div className="flex justify-center relative w-full max-w-[600px] mx-auto mt-5">
+      <input
+        type="search"
+        placeholder="Procure aqui..."
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
+        className="h-10 bg-white w-full px-4 rounded-full py-2 text-gray-700 focus:outline-none shadow-sm border border-gray-200"
+      />
+
+      {isDropdownOpen && (loading || results.length > 0) && (
+        <ul className="absolute top-12 bg-white border border-gray-200 rounded-xl shadow-lg w-full z-50 overflow-hidden">
+          {loading && (
+            <li className="px-4 py-2 text-gray-400 text-sm italic">
+              Buscando...
             </li>
-          ))}
+          )}
+
+          {!loading &&
+            results.map((produto) => (
+              <li
+                key={produto.id}
+                className="px-4 py-3 hover:bg-gray-100 cursor-pointer text-gray-700 text-sm border-b border-gray-50 last:border-0"
+                onClick={() => {
+                  setInput(produto.nome);
+                  setIsDropdownOpen(false);
+                }}
+              >
+                {produto.nome}
+              </li>
+            ))}
         </ul>
       )}
     </div>

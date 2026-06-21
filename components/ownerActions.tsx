@@ -8,11 +8,13 @@ import EditarProduto from "../app/profile/components/editar-produto";
 interface OwnerActionsProps {
   productOwnerId: number | undefined;
   produtoData: any;
+  onClick: () => void;
 }
 
 export default function OwnerActions({
   productOwnerId,
   produtoData,
+  onClick,
 }: OwnerActionsProps) {
   const [isOwner, setIsOwner] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -43,7 +45,12 @@ export default function OwnerActions({
 
       {isModalOpen && (
         <EditarProduto
-          onClose={() => setIsModalOpen(false)}
+          onClose={(deleted) => {
+            setIsModalOpen(false);
+            if (!deleted) {
+              onClick();
+            }
+          }}
           produtoData={produtoData}
         />
       )}

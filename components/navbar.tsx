@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { CgProfile } from "react-icons/cg";
 import { IoMdExit } from "react-icons/io";
 
@@ -18,6 +18,12 @@ export default function Navbar() {
   const [isLogged, setIsLogged] = useState<boolean>(false);
   const [myProfile, setMyProfile] = useState<number>();
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const query = searchParams.toString();
+  const urlComplete = query ? `${pathname}?${query}` : pathname;
+  const returnTo = encodeURIComponent(urlComplete);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -39,7 +45,7 @@ export default function Navbar() {
   };
 
   return isLogged ? (
-    <nav className="flex justify-between min-h-15 min-w-screen bg-black justify-items-center ">
+    <nav className="flex justify-between min-h-15 max-w-screen bg-black justify-items-center ">
       <h1>
         <Link href="/feed">
           <Image
@@ -80,7 +86,7 @@ export default function Navbar() {
       <div className="justify-items-right ">
         <Link
           className="text-white cursor-pointer hover:underline relative right-32 top-4.5 text-lg"
-          href={"/login"}
+          href={`/login?returnTo=${returnTo}`}
         >
           {" "}
           LOGIN

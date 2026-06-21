@@ -4,6 +4,8 @@ import { api } from "@/app/services/api"
 import Modal from "@/components/modal"
 import { useState, useEffect } from "react"
 
+import { ReactNode } from "react"
+
 type Categoria = {
     id: number
     nome: string
@@ -12,9 +14,10 @@ type Categoria = {
 type Props = {
     usuario_id: number
     onSuccess?: () => void
+    trigger?: ReactNode
 }
 
-export function ModalCriarLoja({usuario_id, onSuccess}: Props) {
+export function ModalCriarLoja({usuario_id, onSuccess, trigger}: Props) {
     const [estaAberto, setEstaAberto] = useState(false)
     const [carregando, setCarregando] = useState(false)
     const [erro, setErro] = useState("")
@@ -56,12 +59,9 @@ export function ModalCriarLoja({usuario_id, onSuccess}: Props) {
             await api.post("/lojas", {
                 nome: form.nome,
                 descricao: form.descricao,
-                logo_url: form.logo_url || null,
-                banner_url: form.banner_url || null,
-                sticker_url: form.sticker_url || null,
-                categoria_id: form.categoria_id 
-                    ? Number(form.categoria_id)
-                    : null,
+                logo_url: form.logo_url || undefined,
+                banner_url: form.banner_url || undefined,
+                sticker_url: form.sticker_url || undefined,
                 usuario_id: usuario_id,
             }, {
                 headers: { Authorization: `Bearer ${token}` }
@@ -89,11 +89,18 @@ export function ModalCriarLoja({usuario_id, onSuccess}: Props) {
 
     return (
         <>
-        <button
-        onClick={() => setEstaAberto(true)}
-        className="px-6 py-2 bg-blue-600 text-white rounded-full hover:bg-purple-700 transition-colors">
-        Adicionar loja
-        </button>
+        {trigger ? (
+            <div onClick={() => setEstaAberto(true)} className="inline-block">
+                {trigger}
+            </div>
+        ) : (
+            <button
+                onClick={() => setEstaAberto(true)}
+                className="px-6 py-2 bg-blue-600 text-white rounded-full hover:bg-purple-700 transition-colors"
+            >
+                Adicionar loja
+            </button>
+        )}
 
         {estaAberto && (
             <Modal
