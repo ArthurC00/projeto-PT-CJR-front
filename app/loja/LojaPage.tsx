@@ -47,8 +47,8 @@ export default function LojaPage({ idLoja }: TelaLojaProps) {
   const [produtos, setProdutos] = useState<ProductResponse[]>([]);
   const [paginaAtual, setPaginaAtual] = useState(1);
   const [countdown, setCountdown] = useState(3);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // ESTADOS: Autenticação e Controle do Modal e da avaliação.
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -61,6 +61,7 @@ export default function LojaPage({ idLoja }: TelaLojaProps) {
 
   const carregarLoja = async () => {
     try {
+      setIsLoading(true);
       const lojaData = await getLojaByLojaId(idLoja);
       setLojaDados(lojaData);
 
@@ -74,6 +75,8 @@ export default function LojaPage({ idLoja }: TelaLojaProps) {
       setProdutos(prodData);
     } catch (error) {
       console.log("Erro ao buscar a loja:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -148,6 +151,14 @@ export default function LojaPage({ idLoja }: TelaLojaProps) {
     const timer = setInterval(() => setCountdown((prev) => prev - 1), 1000);
     return () => clearInterval(timer);
   }, [lojaDados, countdown, router]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#F6F3E4] text-black">
+        <h1 className="text-3xl font-bold animate-pulse">Carregando loja...</h1>
+      </div>
+    );
+  }
 
   if (!lojaDados) {
     return (
